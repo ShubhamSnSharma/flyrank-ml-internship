@@ -1,6 +1,6 @@
 # submission/
 
-One file lives here: **`[paper_url.txt](https://shubhamsnsharma.github.io/flyrank-ml-internship/#playbook)`**.
+One file lives here: **https://shubhamsnsharma.github.io/flyrank-ml-internship/**.
 
 When your capstone research paper is deployed, replace the placeholder in
 `paper_url.txt` with **exactly one line — the direct URL of your deployed paper**.
