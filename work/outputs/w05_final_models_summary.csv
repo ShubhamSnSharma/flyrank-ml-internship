@@ -1,0 +1,8 @@
+Model,Feature Repr,Precision@50,Train Acc,Test Acc,ROC-AUC,Reason Included,Recommendation
+Week 4 Rule,"Apr: impr, pos, pv (rule-based)",0.2600,N/A,N/A,N/A,Handwritten rule from Week 4 — no training,Do not deploy — lower P@50 than any ML model
+Logistic Regression,Static (3),0.2200,0.5135,0.4870,0.4714,First supervised ML; replicates w05_model.ipynb,Keep as explanation model only
+Decision Tree,Trajectory (13),0.4800,0.6473,0.5096,0.5471,First nonlinear learner; rules are readable,Keep as audit/explanation model
+Random Forest <-- BEST,Trajectory (13),0.6000,0.7109,0.5732,0.5876,Ensemble of 200 trees; lower variance than single tree,Strong candidate for production
+Extra Trees,Trajectory (13),0.4600,0.6238,0.4910,0.5330,Random thresholds; further variance reduction,Strong candidate for production
+Gradient Boosting,Trajectory (13),0.4600,0.7081,0.5958,0.5977,Sequential correction; strong on structured data,Strong candidate for production
+HistGradientBoosting,Trajectory (13),0.5400,0.7042,0.6063,0.5968,Histogram-accelerated boosting,Strong candidate for production
