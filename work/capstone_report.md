@@ -25,7 +25,7 @@
 ## 1. Problem framing
 
 ### Decision Supported
-In enterprise digital publishing, organizations manage content libraries spanning thousands of URLs. Organic search traffic can change over time, but editorial teams operate under finite diagnostic bandwidth and cannot manually investigate every page with equal depth. For this study, 15–20 high-depth page reviews per week are used as an illustrative editorial planning assumption.
+In enterprise digital publishing, organizations manage content libraries spanning thousands of URLs. Organic search traffic can change over time, but editorial teams operate under finite diagnostic bandwidth and cannot manually investigate every page with equal depth.
 
 This research supports **candidate queue prioritization for human editorial content review**. Rather than attempting to automate editorial interventions or reverse-engineer search engine ranking algorithms, the model ranks URLs by their predicted likelihood of meeting the study's subsequent click-decay label, allowing editorial teams to direct diagnostic attention toward pages showing empirical decline signals.
 
@@ -43,7 +43,9 @@ This research supports **candidate queue prioritization for human editorial cont
 ### Why Machine Learning Helps
 Rule-based heuristics typically evaluate single search metrics in isolation (such as filtering solely by average ranking position or low clicks). A multivariate supervised model combines these historical signals into a single ranking score. On the primary client-held-out split, Logistic Regression achieved higher Precision@50 than the Week 4 heuristic baseline, while repeated client-grouped validation showed substantial variation across partitions.
 
-$$\text{Model Signal} \longrightarrow \text{Review Priority} \longrightarrow \text{Human Diagnosis} \longrightarrow \text{Editorial Decision}$$
+$$
+\text{Model Signal} \longrightarrow \text{Review Priority} \longrightarrow \text{Human Diagnosis} \longrightarrow \text{Editorial Decision}
+$$
 
 ---
 
@@ -53,7 +55,7 @@ $$\text{Model Signal} \longrightarrow \text{Review Priority} \longrightarrow \te
 The analysis was conducted on the FlyRank Internship Warehouse (`hf://datasets/FlyRank/internship-warehouse`, build `v20260703`), querying the `fact_content_daily_performance` table partitioned across clients and content URLs.
 
 To restrict the analysis to pages with measurable search activity, we filtered the portfolio using the study's activity-based eligibility criteria:
-1. $\text{GSC Impressions}_{\text{Feb–Apr}} \ge 1,000$
+1. $\text{GSC Impressions}_{\text{Feb-Apr}} \ge 1,000$
 2. $\text{GSC Clicks}_{\text{Apr}} \ge 10$
 
 After applying these activity criteria, the cohort contained **$N = 16,513$ eligible pages** across **36 client domains**.
@@ -78,12 +80,20 @@ The published analysis and repository artifacts contain no client domain names, 
 ### Formulation of the Week 4 Heuristic Baseline Rule
 To establish a transparent, non-learned benchmark, we built the **Week 4 Heuristic Baseline Rule**. For each page, the baseline computes the mean daily score across its available April records, where each daily score is the sum of three binary signals: GSC impressions $\ge 10$, average position $> 10$, and GA4 pageviews $\ge 1$:
 
-$$\text{Daily Score}_d = \mathbf{1}_{\{\text{gsc\_impressions} \ge 10\}} + \mathbf{1}_{\{\text{gsc\_avg\_position} > 10\}} + \mathbf{1}_{\{\text{ga4\_pageviews} \ge 1\}}$$
-$$\text{Baseline Score} = \text{mean of Daily Score across available April records}$$
+$$
+\text{Daily Score}_d = \mathbf{1}_{\{\text{gsc\_impressions} \ge 10\}} + \mathbf{1}_{\{\text{gsc\_avg\_position} > 10\}} + \mathbf{1}_{\{\text{ga4\_pageviews} \ge 1\}}
+$$
+
+$$
+\text{Baseline Score} = \text{mean of Daily Score across available April records}
+$$
 
 ### Fair Comparison Design
 The baseline is evaluated on the exact same held-out test pages as the machine learning model and ranked using the exact same deterministic tie-breaking cascade:
-$$\text{Score DESC} \longrightarrow \text{April Impressions DESC} \longrightarrow \text{April Pageviews DESC} \longrightarrow \text{Average Position ASC} \longrightarrow \text{content\_hash\_id ASC}$$
+
+$$
+\text{Score DESC} \longrightarrow \text{April Impressions DESC} \longrightarrow \text{April Pageviews DESC} \longrightarrow \text{Average Position ASC} \longrightarrow \text{content\_hash\_id ASC}
+$$
 
 ### Baseline Performance Metrics
 - **Primary Holdout Split ($N = 1,727$ pages across 8 clients)**: The Week 4 Baseline achieved a **Precision@50 of 0.2000** ($10/50$ true declining pages identified).
@@ -104,11 +114,11 @@ Pipeline([
 
 ### The 9 Modeling Features
 The feature vector uses **5 continuous historical search and analytics metrics (4 log-transformed) + 4 boolean platform availability flags**:
-1. `log_gsc_impressions_feb_apr`: $\log(1 + \text{Impressions}_{\text{Feb–Apr}})$ — Search exposure volume.
+1. `log_gsc_impressions_feb_apr`: $\log(1 + \text{Impressions}_{\text{Feb-Apr}})$ — Search exposure volume.
 2. `log_gsc_clicks_apr`: $\log(1 + \text{Clicks}_{\text{Apr}})$ — Baseline traffic volume.
 3. `gsc_avg_position_apr`: Average Search Console ranking position during April 2026.
-4. `log_ga4_pageviews_feb_apr`: $\log(1 + \text{Pageviews}_{\text{Feb–Apr}})$ — Historical on-site consumption.
-5. `log_ga4_engaged_sessions_feb_apr`: $\log(1 + \text{Engaged Sessions}_{\text{Feb–Apr}})$ — Historical user engagement.
+4. `log_ga4_pageviews_feb_apr`: $\log(1 + \text{Pageviews}_{\text{Feb-Apr}})$ — Historical on-site consumption.
+5. `log_ga4_engaged_sessions_feb_apr`: $\log(1 + \text{Engaged Sessions}_{\text{Feb-Apr}})$ — Historical user engagement.
 6. `client_has_gsc`: Boolean flag indicating Search Console access configured pre-May.
 7. `client_has_ga4`: Boolean flag indicating GA4 analytics access configured pre-May.
 8. `gsc_data_available`: Boolean flag confirming active Search Console tracking.
@@ -116,7 +126,10 @@ The feature vector uses **5 continuous historical search and analytics metrics (
 
 ### Target Definition
 A binary decay label indicating whether May organic search clicks dropped by $\ge 20\%$ relative to April:
-$$y = \mathbf{1}_{\{\text{Clicks}_{\text{May}} < 0.80 \times \text{Clicks}_{\text{Apr}}\}}$$
+
+$$
+y = \mathbf{1}_{\{\text{Clicks}_{\text{May}} < 0.80 \times \text{Clicks}_{\text{Apr}}\}}
+$$
 
 - **Portfolio Base Rate**: $41.62\%$ ($6,873$ declining pages out of $16,513$).
 - **Held-Out Test Base Rate**: $38.68\%$ ($668$ declining pages out of $1,727$).
