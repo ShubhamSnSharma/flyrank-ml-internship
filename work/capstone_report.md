@@ -90,11 +90,7 @@ $$
 \mathbf{1}_{\{\text{GA4 pageviews} \ge 1\}}
 $$
 
-$$
-\text{Baseline Score}
-=
-\text{mean of Daily Score across available April records}
-$$
+$\text{Baseline Score} = \text{mean of Daily Score across available April records}$
 
 ### Fair Comparison Design
 
