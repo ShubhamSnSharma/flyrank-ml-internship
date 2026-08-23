@@ -78,25 +78,44 @@ The published analysis and repository artifacts contain no client domain names, 
 ## 3. Baseline
 
 ### Formulation of the Week 4 Heuristic Baseline Rule
+
 To establish a transparent, non-learned benchmark, we built the **Week 4 Heuristic Baseline Rule**. For each page, the baseline computes the mean daily score across its available April records, where each daily score is the sum of three binary signals: GSC impressions $\ge 10$, average position $> 10$, and GA4 pageviews $\ge 1$:
 
 $$
-\text{Daily Score}_d = \mathbf{1}_{\{\text{gsc\_impressions} \ge 10\}} + \mathbf{1}_{\{\text{gsc\_avg\_position} > 10\}} + \mathbf{1}_{\{\text{ga4\_pageviews} \ge 1\}}
+\text{Daily Score}_d =
+\mathbf{1}_{\{\text{GSC impressions} \ge 10\}}
++
+\mathbf{1}_{\{\text{average position} > 10\}}
++
+\mathbf{1}_{\{\text{GA4 pageviews} \ge 1\}}
 $$
 
 $$
-\text{Baseline Score} = \text{mean of Daily Score across available April records}
+\text{Baseline Score}
+=
+\text{mean of Daily Score across available April records}
 $$
 
 ### Fair Comparison Design
+
 The baseline is evaluated on the exact same held-out test pages as the machine learning model and ranked using the exact same deterministic tie-breaking cascade:
 
 $$
-\text{Score DESC} \longrightarrow \text{April Impressions DESC} \longrightarrow \text{April Pageviews DESC} \longrightarrow \text{Average Position ASC} \longrightarrow \text{content\_hash\_id ASC}
+\text{Score DESC}
+\longrightarrow
+\text{April Impressions DESC}
+\longrightarrow
+\text{April Pageviews DESC}
+\longrightarrow
+\text{Average Position ASC}
+\longrightarrow
+\text{Content ID ASC}
 $$
 
 ### Baseline Performance Metrics
+
 - **Primary Holdout Split ($N = 1,727$ pages across 8 clients)**: The Week 4 Baseline achieved a **Precision@50 of 0.2000** ($10/50$ true declining pages identified).
+
 - **5 Repeated Client-Grouped Splits**: Across 5 repeated `GroupShuffleSplit` holdouts (`seeds 42–46`), the baseline achieved a mean Precision@50 of **0.3240 ± 0.2165** (range: 0.1400 to 0.5600).
 
 ---
