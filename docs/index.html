@@ -6,40 +6,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prioritizing Enterprise Content for Organic Search Traffic Decay Risk — FlyRank ML Capstone</title>
   <meta name="description"
-    content="Public research artifact for the FlyRank ML Engineering Internship by Shubham Sharma. Prioritizing enterprise content for organic search traffic decay risk using machine learning and decision-support playbooks." />
+    content="A machine learning engineering investigation by Shubham Sharma into whether historical search signals can prioritize URLs for editorial diagnostic review." />
 
+  <!-- Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
     rel="stylesheet">
 
   <style>
     :root {
-      --charcoal: #2B2D42;
-      --text: #1A1A1A;
       --bg: #F7F7F5;
+      --surface: #FFFFFF;
+      --text: #1A1A1A;
+      --charcoal: #2B2D42;
+      --muted: #5C6068;
+      --line: rgba(43, 45, 66, 0.12);
+      --line-subtle: rgba(43, 45, 66, 0.06);
       --rust: #C1502E;
-      --rust-light: rgba(193, 80, 46, 0.08);
-      --line: rgba(43, 45, 66, 0.14);
-      --muted: rgba(26, 26, 26, 0.62);
-      --card-bg: #FFFFFF;
-      --code-bg: #EFEFEA;
+      --rust-light: rgba(193, 80, 46, 0.06);
+      --green: #2E7D32;
+      --green-light: rgba(46, 125, 50, 0.08);
+      --amber: #B45309;
+      --amber-light: rgba(180, 83, 9, 0.08);
+      --code-bg: #ECECE8;
+      --max-width: min(1340px, 92vw);
+      --content-width: 820px;
     }
 
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     html {
       scroll-behavior: smooth;
+      font-size: 16px;
     }
 
     body {
-      margin: 0;
       background: var(--bg);
       color: var(--text);
-      font-family: 'Inter', -apple-system, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       line-height: 1.65;
       -webkit-font-smoothing: antialiased;
     }
@@ -49,8 +59,17 @@
     h3,
     h4 {
       font-family: 'Space Grotesk', sans-serif;
-      margin: 0;
       color: var(--charcoal);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    code,
+    pre,
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9em;
     }
 
     a {
@@ -59,58 +78,100 @@
     }
 
     a:focus-visible,
-    button:focus-visible,
-    input:focus-visible {
+    button:focus-visible {
       outline: 2px solid var(--rust);
       outline-offset: 3px;
     }
 
-    code,
-    pre {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-    }
-
+    /* Layout Wrappers */
     .wrap {
-      max-width: 1180px;
+      width: 100%;
+      max-width: var(--max-width);
       margin: 0 auto;
-      padding: 0 48px;
+      padding: 0 24px;
     }
 
-    /* ---------- Nav ---------- */
+    .content-col {
+      max-width: var(--content-width);
+    }
 
-    nav.top {
-      padding: 22px 0;
-      border-bottom: 1px solid var(--line);
-      background: rgba(247, 247, 245, 0.92);
-      backdrop-filter: blur(8px);
+    /* Status Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-locked {
+      background: var(--green-light);
+      color: var(--green);
+      border: 1px solid rgba(46, 125, 50, 0.25);
+    }
+
+    .badge-exploratory {
+      background: var(--amber-light);
+      color: var(--amber);
+      border: 1px solid rgba(180, 83, 9, 0.25);
+    }
+
+    .badge-leakage {
+      background: rgba(43, 45, 66, 0.08);
+      color: var(--charcoal);
+      border: 1px solid rgba(43, 45, 66, 0.2);
+    }
+
+    /* ---------- Sticky Nav ---------- */
+    nav.top-nav {
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 1000;
+      background: rgba(247, 247, 245, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+      padding: 16px 0;
     }
 
-    nav.top .wrap {
+    .nav-inner {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .nav-mark {
+    .nav-brand {
       font-family: 'JetBrains Mono', monospace;
       font-size: 13px;
+      font-weight: 600;
       color: var(--charcoal);
-      font-weight: 500;
-      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-brand .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--rust);
+      display: inline-block;
     }
 
     .nav-links {
       display: flex;
-      gap: 24px;
+      gap: 16px;
+      flex-wrap: wrap;
     }
 
     .nav-links a {
-      font-size: 13.5px;
+      font-size: 13px;
       color: var(--muted);
+      font-weight: 500;
       transition: color 0.15s ease;
     }
 
@@ -118,637 +179,749 @@
       color: var(--rust);
     }
 
-    /* ---------- Hero ---------- */
-
-    header.hero {
-      padding: 64px 0 0;
+    /* ---------- Section Framework ---------- */
+    section.section-block {
+      padding: 72px 0;
       border-bottom: 1px solid var(--line);
-      background:
-        radial-gradient(ellipse 900px 500px at 85% -10%, rgba(193, 80, 46, 0.06), transparent);
     }
 
-    .hero-inner {
-      padding-bottom: 60px;
+    .section-eyebrow {
+      display: block;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--rust);
+      margin-bottom: 12px;
     }
 
-    .eyebrow {
+    .section-title {
+      font-size: clamp(26px, 3.2vw, 34px);
+      margin-bottom: 18px;
+      color: var(--charcoal);
+      max-width: 920px;
+    }
+
+    .section-p {
+      font-size: 16.5px;
+      color: var(--text);
+      line-height: 1.65;
+      margin-bottom: 22px;
+      max-width: var(--content-width);
+    }
+
+    .section-p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ---------- Hero Section ---------- */
+    header.hero-section {
+      padding: 88px 0 68px;
+      border-bottom: 1px solid var(--line);
+      background: radial-gradient(circle at 92% 8%, rgba(193, 80, 46, 0.04), transparent 55%);
+    }
+
+    .hero-eyebrow {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
+      font-size: 12.5px;
+      font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
       color: var(--rust);
-      font-weight: 600;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
-    .eyebrow::before {
-      content: "";
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--rust);
-      display: inline-block;
+    h1.hero-title {
+      font-size: clamp(32px, 4.4vw, 50px);
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin-bottom: 18px;
+      color: var(--charcoal);
+      max-width: 1040px;
     }
 
-    h1.name {
-      font-size: clamp(34px, 5vw, 52px);
+    p.hero-subtitle {
+      font-size: clamp(17px, 2vw, 20px);
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 40px;
+      max-width: 880px;
+    }
+
+    /* Hero Scale Metrics Grid */
+    .hero-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .hero-stat-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--charcoal);
+      border-radius: 0 0 6px 6px;
+      padding: 20px 24px;
+    }
+
+    .hero-stat-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(30px, 3.8vw, 40px);
       font-weight: 700;
       color: var(--charcoal);
-      letter-spacing: -0.02em;
       line-height: 1.1;
+      margin-bottom: 4px;
     }
 
-    .role {
-      margin-top: 14px;
-      font-size: 17px;
+    .hero-stat-label {
+      font-size: 13.5px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* Hero Core Result & Stability Block */
+    .hero-result-banner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--rust);
+      border-radius: 0 6px 6px 0;
+      padding: 20px 26px;
+      margin-bottom: 28px;
+    }
+
+    .hero-result-col {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .hero-result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .hero-result-col h4 {
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       color: var(--muted);
     }
 
-    .hero-row {
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 56px;
-      margin-top: 40px;
-      align-items: start;
+    .hero-result-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(20px, 2.5vw, 24px);
+      font-weight: 700;
+      color: var(--charcoal);
     }
 
-    blockquote.proof {
-      margin: 0;
-      padding-left: 22px;
-      border-left: 2px solid var(--rust);
+    .hero-result-sub {
+      font-size: 13.5px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Hero Statement */
+    .hero-statement {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 20px;
+      font-size: 16.5px;
       font-weight: 500;
       color: var(--charcoal);
-      line-height: 1.45;
-    }
-
-    .bio {
-      margin-top: 20px;
-      font-size: 15px;
-      color: var(--text);
-      max-width: 60ch;
-    }
-
-    /* ---------- Signature: progression strip ---------- */
-
-    .progression {
+      background: #FFFFFF;
       border: 1px solid var(--line);
       border-radius: 6px;
-      padding: 24px 26px;
-      background: var(--card-bg);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-    }
-
-    .progression-label {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-    }
-
-    .progression-label span.metric {
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--rust);
-      text-transform: none;
-      letter-spacing: 0;
-      font-weight: 600;
-    }
-
-    .prog-row {
-      display: grid;
-      grid-template-columns: 1fr auto 64px;
-      align-items: center;
-      gap: 12px;
-      padding: 9px 0;
-      border-bottom: 1px solid var(--line);
-      font-size: 13px;
-    }
-
-    .prog-row:last-of-type {
-      border-bottom: none;
-    }
-
-    .prog-name {
-      color: var(--text);
-    }
-
-    .prog-name.winner {
-      color: var(--charcoal);
-      font-weight: 600;
-    }
-
-    .prog-bar-track {
-      height: 5px;
-      background: var(--bg);
-      border-radius: 3px;
-      overflow: hidden;
-      width: 100px;
-    }
-
-    .prog-bar-fill {
-      height: 100%;
-      background: var(--muted);
-      border-radius: 3px;
-    }
-
-    .prog-bar-fill.winner {
-      background: var(--rust);
-    }
-
-    .prog-bar-fill.leaky {
-      background: #8E9AAF;
-    }
-
-    .prog-score {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      color: var(--muted);
-      text-align: right;
-    }
-
-    .prog-score.winner {
-      color: var(--rust);
-      font-weight: 600;
-    }
-
-    .prog-footnote {
-      margin-top: 14px;
-      padding-top: 12px;
-      border-top: 1px solid var(--line);
-      font-size: 12px;
-      color: var(--muted);
+      padding: 16px 22px;
+      margin-bottom: 32px;
       line-height: 1.45;
     }
 
-    /* ---------- Links ---------- */
-
-    section.links {
-      padding: 36px 0;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .link-row {
+    /* Action Buttons */
+    .hero-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
+      align-items: center;
     }
 
-    .link-primary {
+    .btn-primary {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       background: var(--rust);
-      color: #fff;
+      color: #FFFFFF;
       font-family: 'Space Grotesk', sans-serif;
-      font-weight: 500;
-      font-size: 14.5px;
-      padding: 11px 20px;
-      border-radius: 3px;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 11px 22px;
+      border-radius: 4px;
       transition: opacity 0.15s ease, transform 0.15s ease;
     }
 
-    .link-primary:hover {
+    .btn-primary:hover {
       opacity: 0.92;
       transform: translateY(-1px);
     }
 
-    .link-secondary {
+    .btn-secondary {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       background: transparent;
-      border: 1px solid var(--line);
       color: var(--charcoal);
+      border: 1px solid var(--line);
       font-family: 'Inter', sans-serif;
       font-weight: 500;
-      font-size: 14px;
+      font-size: 13.5px;
       padding: 10px 18px;
-      border-radius: 3px;
-      transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
-    }
-
-    .link-secondary:hover {
-      border-color: var(--charcoal);
-      background: rgba(43, 45, 66, 0.04);
-      transform: translateY(-1px);
-    }
-
-    .link-note {
-      margin-top: 12px;
-      font-size: 12.5px;
-      color: var(--muted);
-    }
-
-    /* ---------- Section Headings ---------- */
-
-    .section-head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      margin-bottom: 24px;
-      border-bottom: 1px solid var(--line);
-      padding-bottom: 10px;
-    }
-
-    .section-head .label {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--muted);
-      font-weight: 600;
-    }
-
-    .section-head .count {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    /* ---------- Content Sections ---------- */
-
-    section.content-block {
-      padding: 48px 0;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 24px;
-    }
-
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-    }
-
-    .grid-equal {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-    }
-
-    .card {
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 24px 26px;
-      background: var(--card-bg);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-    }
-
-    .card .tag {
-      display: inline-block;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 11.5px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--rust);
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .card .tag.muted-tag {
-      color: var(--muted);
-    }
-
-    .card h3 {
-      font-size: 18px;
-      margin-bottom: 10px;
-      color: var(--charcoal);
-    }
-
-    .card h4 {
-      font-size: 15px;
-      margin: 14px 0 6px;
-      color: var(--charcoal);
-    }
-
-    .card p {
-      margin: 0 0 12px;
-      font-size: 14.5px;
-      color: var(--text);
-    }
-
-    .card p:last-of-type {
-      margin-bottom: 0;
-    }
-
-    .card p.muted {
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .card ul {
-      margin: 0 0 12px;
-      padding-left: 18px;
-      font-size: 14px;
-      color: var(--text);
-    }
-
-    .card ul li {
-      margin-bottom: 4px;
-    }
-
-    /* ---------- Tables ---------- */
-
-    table.data-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-      margin: 12px 0;
-    }
-
-    table.data-table th,
-    table.data-table td {
-      padding: 8px 12px;
-      text-align: left;
-      border-bottom: 1px solid var(--line);
-    }
-
-    table.data-table th {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--muted);
-      font-weight: 600;
-      background: var(--bg);
-    }
-
-    table.data-table td.mono {
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    table.data-table tr.highlight-row {
-      background: var(--rust-light);
-      font-weight: 600;
-    }
-
-    /* ---------- Formula Box ---------- */
-
-    .formula-box {
-      background: var(--code-bg);
-      border: 1px solid var(--line);
-      border-left: 3px solid var(--rust);
       border-radius: 4px;
-      padding: 12px 16px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12.5px;
-      color: var(--charcoal);
-      margin: 12px 0;
-      overflow-x: auto;
+      transition: background 0.15s ease, border-color 0.15s ease;
     }
 
-    /* ---------- Workflow Flow Diagram ---------- */
+    .btn-secondary:hover {
+      background: rgba(43, 45, 66, 0.04);
+      border-color: var(--charcoal);
+    }
 
-    .workflow-strip {
+    /* ---------- Timeline / Progression Grid ---------- */
+    .investigation-timeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      margin: 20px 0 12px;
+    }
+
+    .timeline-step {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 12px 14px;
+    }
+
+    .timeline-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--rust);
+      margin-bottom: 3px;
+    }
+
+    .timeline-step h4 {
+      font-size: 13.5px;
+      margin-bottom: 3px;
+      color: var(--charcoal);
+    }
+
+    .timeline-step p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    /* ---------- Flow Pipeline Track ---------- */
+    .flow-track {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       gap: 10px;
-      background: var(--bg);
+      background: var(--surface);
       border: 1px solid var(--line);
-      padding: 14px 18px;
-      border-radius: 4px;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--charcoal);
-      margin: 14px 0;
+      border-radius: 6px;
+      padding: 16px 22px;
+      margin: 20px 0;
     }
 
-    .workflow-step {
-      background: var(--card-bg);
+    .flow-node {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--charcoal);
+    }
+
+    .flow-node.highlight {
+      color: var(--rust);
+    }
+
+    .flow-arrow {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* ---------- 3 Column Investigation Cards ---------- */
+    .grid-3col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin: 28px 0;
+    }
+
+    .investigation-card {
+      background: var(--surface);
       border: 1px solid var(--line);
-      padding: 6px 12px;
+      border-top: 3px solid var(--charcoal);
+      border-radius: 0 0 6px 6px;
+      padding: 22px 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .investigation-card.exploratory {
+      border-top: 3px solid var(--amber);
+    }
+
+    .investigation-card.leakage {
+      border-top: 3px solid var(--charcoal);
+    }
+
+    .investigation-card.validation {
+      border-top: 3px solid var(--green);
+    }
+
+    .inv-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .inv-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .investigation-card h3 {
+      font-size: 17px;
+      color: var(--charcoal);
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+
+    .investigation-card p {
+      font-size: 13.5px;
+      color: var(--text);
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+
+    .inv-metric-badge {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 10px 12px;
+      font-size: 12.5px;
+      color: var(--charcoal);
+    }
+
+    /* ---------- 2 Column Grid ---------- */
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .card-box {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 20px 24px;
+    }
+
+    .card-box h4 {
+      font-size: 15.5px;
+      margin-bottom: 8px;
+      color: var(--charcoal);
+    }
+
+    .card-box p {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    /* ---------- Comparison Bars ---------- */
+    .comp-bar-container {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 20px 24px;
+      margin: 20px 0;
+      max-width: var(--content-width);
+    }
+
+    .comp-row {
+      display: grid;
+      grid-template-columns: 190px 1fr 70px;
+      align-items: center;
+      gap: 16px;
+      padding: 8px 0;
+    }
+
+    .comp-name {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--charcoal);
+    }
+
+    .comp-track {
+      height: 10px;
+      background: var(--bg);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .comp-fill {
+      height: 100%;
+      border-radius: 5px;
+    }
+
+    .comp-fill.base {
+      width: 20%;
+      background: var(--muted);
+    }
+
+    .comp-fill.model {
+      width: 24%;
+      background: var(--rust);
+    }
+
+    .comp-fill.leak {
+      width: 100%;
+      background: #1A1A1A;
+    }
+
+    .comp-score {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .comp-score.accent {
+      color: var(--rust);
+    }
+
+    /* ---------- Zero-Line Diverging Lift Chart ---------- */
+    .lift-chart {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 20px 24px 8px;
+      margin: 20px 0;
+    }
+
+    .lift-row {
+      display: grid;
+      grid-template-columns: 110px 1fr 64px;
+      align-items: center;
+      gap: 14px;
+      padding: 9px 0;
+    }
+
+    .lift-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--charcoal);
+    }
+
+    .lift-track {
+      position: relative;
+      height: 16px;
+      background: var(--bg);
       border-radius: 3px;
     }
 
-    .workflow-arrow {
-      color: var(--rust);
-      font-weight: 700;
+    .lift-zero {
+      position: absolute;
+      top: -3px;
+      bottom: -3px;
+      left: 50%;
+      width: 2px;
+      background: var(--charcoal);
+      opacity: 0.35;
     }
 
-    /* ---------- Figure Embeds ---------- */
+    .lift-bar {
+      position: absolute;
+      top: 2px;
+      bottom: 2px;
+      border-radius: 2px;
+    }
 
-    .figure-container {
-      margin: 16px 0;
+    .lift-bar.pos {
+      left: 50%;
+      background: var(--green);
+    }
+
+    .lift-bar.neg {
+      right: 50%;
+      background: var(--rust);
+    }
+
+    .lift-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .lift-val.pos {
+      color: var(--green);
+    }
+
+    .lift-val.neg {
+      color: var(--rust);
+    }
+
+    .lift-axis-labels {
+      display: grid;
+      grid-template-columns: 110px 1fr 64px;
+      gap: 14px;
+      padding-bottom: 12px;
+      margin-top: 2px;
+    }
+
+    .lift-axis-labels span {
+      font-size: 10.5px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* ---------- Validation Split Strip ---------- */
+    .splits-container {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin: 20px 0 16px;
+    }
+
+    .split-item {
+      background: var(--surface);
       border: 1px solid var(--line);
       border-radius: 6px;
-      overflow: hidden;
-      background: #fff;
+      padding: 14px 12px;
+      text-align: center;
     }
 
-    .figure-container img {
+    .split-item.primary {
+      border-color: var(--rust);
+      background: #FFFDFD;
+    }
+
+    .split-seed-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .split-lift-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .split-lift-val.pos {
+      color: var(--green);
+    }
+
+    .split-lift-val.neg {
+      color: var(--rust);
+    }
+
+    .split-subtext {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+
+    /* ---------- Safety Callout Block ---------- */
+    .safety-block {
+      background: var(--surface);
+      border-left: 4px solid var(--rust);
+      border-top: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      border-radius: 0 6px 6px 0;
+      padding: 22px 26px;
+      margin: 18px 0;
+    }
+
+    .guardrail-token {
+      background: var(--code-bg);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 6px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--charcoal);
+      display: inline-block;
+      margin-bottom: 12px;
+      word-break: break-all;
+    }
+
+    /* ---------- Progressive Disclosure (<details>) ---------- */
+    details.disclosure {
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+      overflow: hidden;
+      width: 100%;
+    }
+
+    details.disclosure summary {
+      padding: 14px 18px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--charcoal);
+      cursor: pointer;
+      background: var(--bg);
+      user-select: none;
+      transition: background 0.15s ease;
+    }
+
+    details.disclosure summary:hover {
+      background: #EFEFEA;
+    }
+
+    details.disclosure .disclosure-body {
+      padding: 20px;
+      font-size: 13.5px;
+      line-height: 1.6;
+      border-top: 1px solid var(--line);
+    }
+
+    table.compact-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      margin-top: 8px;
+    }
+
+    table.compact-table th,
+    table.compact-table td {
+      padding: 7px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+    }
+
+    table.compact-table th {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      background: var(--bg);
+    }
+
+    /* ---------- Figures Embedded ---------- */
+    .fig-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 14px;
+    }
+
+    .fig-item {
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .fig-item img {
       width: 100%;
       height: auto;
       display: block;
     }
 
-    .figure-caption {
-      padding: 10px 16px;
-      font-size: 12.5px;
-      color: var(--muted);
-      border-top: 1px solid var(--line);
-      background: var(--bg);
-      line-height: 1.4;
-    }
-
-    /* ---------- Journey Timeline ---------- */
-
-    .journey-timeline {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      margin-top: 16px;
-    }
-
-    .journey-card {
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      padding: 14px 16px;
-      background: var(--card-bg);
-      font-size: 13px;
-    }
-
-    .journey-card .step-num {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      color: var(--rust);
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .journey-card h4 {
-      font-size: 14px;
-      margin: 4px 0 6px;
-    }
-
-    .journey-card p {
-      margin: 0;
+    .fig-caption {
+      padding: 8px 12px;
       font-size: 12px;
       color: var(--muted);
-      line-height: 1.4;
-    }
-
-    /* ---------- Q&A Widget ---------- */
-
-    .qa-card {
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 26px 28px;
-      background: var(--card-bg);
-    }
-
-    .qa-input-row {
-      display: flex;
-      gap: 10px;
-    }
-
-    #qa-input {
-      flex: 1;
-      padding: 12px 16px;
-      border: 1px solid var(--line);
-      border-radius: 3px;
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      color: var(--text);
       background: var(--bg);
-      transition: border-color 0.15s ease;
-    }
-
-    #qa-input:focus {
-      border-color: var(--rust);
-      outline: none;
-    }
-
-    #qa-submit {
-      padding: 12px 22px;
-      background: var(--charcoal);
-      color: #fff;
-      border: none;
-      border-radius: 3px;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 500;
-      font-size: 14px;
-      cursor: pointer;
-      transition: opacity 0.15s ease;
-      white-space: nowrap;
-    }
-
-    #qa-submit:hover:not(:disabled) {
-      opacity: 0.88;
-    }
-
-    #qa-response {
-      margin-top: 18px;
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.6;
-      padding-top: 14px;
       border-top: 1px solid var(--line);
-    }
-
-    #qa-response.placeholder-text {
-      color: var(--muted);
-    }
-
-    .qa-examples {
-      margin-top: 12px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .qa-chip {
-      font-size: 12px;
-      color: var(--charcoal);
-      background: var(--bg);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 6px 12px;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      transition: border-color 0.15s ease, background 0.15s ease;
-    }
-
-    .qa-chip:hover {
-      border-color: var(--rust);
-      background: var(--rust-light);
+      line-height: 1.4;
     }
 
     /* ---------- Footer ---------- */
-
-    footer {
-      padding: 44px 0 52px;
-      margin-top: 8px;
+    footer.site-footer {
+      padding: 48px 0 32px;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+      color: var(--muted);
     }
 
-    footer .wrap {
+    .footer-inner {
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 16px;
     }
 
-    footer p {
-      font-size: 13px;
-      color: var(--muted);
-      margin: 0;
-    }
-
-    @media (max-width: 960px) {
-      .wrap {
-        padding: 0 24px;
-      }
-
-      .hero-row,
-      .grid-2,
-      .grid-equal {
+    /* ---------- Responsive Media Queries ---------- */
+    @media (max-width: 1080px) {
+      .grid-3col {
         grid-template-columns: 1fr;
-        gap: 32px;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .wrap {
+        padding: 0 18px;
       }
 
-      .grid-3,
-      .journey-timeline {
-        grid-template-columns: 1fr 1fr;
+      .hero-stats-grid,
+      .hero-result-banner,
+      .grid-2col,
+      .fig-grid {
+        grid-template-columns: 1fr;
       }
 
-      nav.top .nav-links {
+      .splits-container {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .comp-row {
+        grid-template-columns: 140px 1fr 60px;
+      }
+
+      .nav-links {
         display: none;
       }
     }
 
-    @media (max-width: 580px) {
-      .grid-3,
-      .journey-timeline {
-        grid-template-columns: 1fr;
+    @media (max-width: 520px) {
+      .splits-container {
+        grid-template-columns: 1fr 1fr;
       }
 
-      .link-row {
+      .hero-actions {
         flex-direction: column;
         align-items: stretch;
       }
 
-      .link-primary,
-      .link-secondary {
+      .btn-primary,
+      .btn-secondary {
         justify-content: center;
-      }
-
-      .qa-input-row {
-        flex-direction: column;
       }
     }
   </style>
@@ -756,725 +929,914 @@
 
 <body>
 
-  <nav class="top">
-    <div class="wrap">
-      <span class="nav-mark">shubham@flyrank · ML-11 Capstone</span>
+  <!-- Top Navigation -->
+  <nav class="top-nav">
+    <div class="wrap nav-inner">
+      <div class="nav-brand">
+        <span class="dot"></span>
+        <span>shubham@flyrank · ML Engineering Capstone</span>
+      </div>
       <div class="nav-links">
-        <a href="#framing">Framing</a>
-        <a href="#data">Data & Baseline</a>
-        <a href="#model">Model & Validation</a>
-        <a href="#playbook">Action Playbook</a>
-        <a href="#safety">Safety & Limits</a>
-        <a href="#qa">Search Findings</a>
+        <a href="#abstract">Abstract</a>
+        <a href="#question">Question</a>
+        <a href="#investigation">Investigation</a>
+        <a href="#exploratory-turn">Exploratory Turn</a>
+        <a href="#baseline">Final Model</a>
+        <a href="#validation">Validation</a>
+        <a href="#leakage">Leakage</a>
+        <a href="#use">Use Cases</a>
+        <a href="#playbook">Playbook</a>
+        <a href="#learnings">Learnings</a>
+        <a href="#safety">Safety</a>
+        <a href="#evidence">Evidence</a>
       </div>
     </div>
   </nav>
 
-  <header class="hero">
-    <div class="wrap hero-inner">
-      <div class="eyebrow">Machine Learning Engineering Capstone · FlyRank AI</div>
-      <h1 class="name">Prioritizing Enterprise Content for Organic Search Traffic Decay Risk</h1>
-      <div class="role">Shubham Sharma · Machine Learning Track · B.Tech CS, Bennett University ('27)</div>
+  <!-- 1. HERO SECTION -->
+  <header class="hero-section">
+    <div class="wrap">
+      <div class="hero-eyebrow">Machine Learning Engineering Capstone · FlyRank AI</div>
+      <h1 class="hero-title">Prioritizing Enterprise Content for Organic Search Traffic Decay Risk</h1>
+      <p class="hero-subtitle">
+        A machine learning engineering investigation into whether historical search-performance signals can help editors
+        decide
+        which published pages to review first.
+      </p>
 
-      <div class="hero-row">
-        <div>
-          <blockquote class="proof">
-            I solve machine learning problems by understanding the problem first, validating transparent baselines, and
-            only adding model complexity when it earns its keep.
-          </blockquote>
-          <p class="bio">
-            This research develops a machine learning approach to content-refresh prioritization across 16,513 eligible
-            pages from 36 client domains in the FlyRank enterprise search-performance warehouse. Rather than attempting
-            autonomous SEO intervention, the model ranks URLs by their predicted likelihood of future search decay to
-            guide scarce human editorial diagnostic bandwidth.
-          </p>
+      <!-- 3 Scale Metrics Grid -->
+      <div class="hero-stats-grid">
+        <div class="hero-stat-card">
+          <div class="hero-stat-num">16,513</div>
+          <div class="hero-stat-label">Eligible Content Pages Analyzed</div>
         </div>
+        <div class="hero-stat-card">
+          <div class="hero-stat-num">36</div>
+          <div class="hero-stat-label">Client Domains in Cohort</div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="hero-stat-num">79M+</div>
+          <div class="hero-stat-label">Warehouse Performance Rows</div>
+        </div>
+      </div>
 
-        <div class="progression">
-          <div class="progression-label">
-            <span>Primary Holdout (Seed 42)</span>
-            <span class="metric">P@50 Lift: +4.0 pp</span>
+      <!-- Core Result & Stability Signal Block -->
+      <div class="hero-result-banner">
+        <div class="hero-result-col">
+          <div class="hero-result-header">
+            <h4>Primary Model Lift (Seed 42)</h4>
+            <span class="badge badge-locked">Final Locked Capstone</span>
           </div>
-
-          <div class="prog-row">
-            <span class="prog-name">Week 4 Heuristic Baseline</span>
-            <div class="prog-bar-track">
-              <div class="prog-bar-fill" style="width: 20%;"></div>
-            </div>
-            <span class="prog-score">0.2000</span>
-          </div>
-
-          <div class="prog-row">
-            <span class="prog-name winner">Logistic Regression (W05)</span>
-            <div class="prog-bar-track">
-              <div class="prog-bar-fill winner" style="width: 24%;"></div>
-            </div>
-            <span class="prog-score winner">0.2400</span>
-          </div>
-
-          <div class="prog-row">
-            <span class="prog-name" style="color: var(--muted); font-size: 12px;">Controlled Leakage Injection</span>
-            <div class="prog-bar-track">
-              <div class="prog-bar-fill leaky" style="width: 100%;"></div>
-            </div>
-            <span class="prog-score" style="color: var(--muted);">1.0000</span>
-          </div>
-
-          <div class="prog-footnote">
-            <strong>Honest Evaluation:</strong> Evaluated on client-grouped holdout partition (Seed 42, N=1,727).
-            Repeated 5-split validation reveals substantial partition sensitivity (Baseline 0.3240 ± 0.2165 vs. LR 0.3400
-            ± 0.1114, mean lift +1.6 pp, range: -12.0 to +14.0 pp).
+          <div class="hero-result-val">20.0% &rarr; 24.0% <span style="color: var(--rust); font-size: 0.85em;">(+4.0
+              pp)</span></div>
+          <div class="hero-result-sub">Baseline vs. Logistic Regression Precision@50 (10/50 &rarr; 12/50 true positives)
           </div>
         </div>
+        <div class="hero-result-col">
+          <div class="hero-result-header">
+            <h4>Repeated Validation Stability</h4>
+            <span class="badge badge-locked">5 Client Splits</span>
+          </div>
+          <div class="hero-result-val" style="color: var(--charcoal);">Mean Lift: +1.6 pp</div>
+          <div class="hero-result-sub">3 of 5 splits improved (Observed lift range: -12.0 pp to +14.0 pp)</div>
+        </div>
+      </div>
+
+      <!-- Honest Transition Statement -->
+      <div class="hero-statement">
+        "The number I cared about wasn't the single-split score — it was how much that score moved when I held out
+        entire client portfolios."
+      </div>
+
+      <!-- 3 Action Buttons -->
+      <div class="hero-actions">
+        <a class="btn-primary"
+          href="https://github.com/ShubhamSnSharma/flyrank-ml-internship/blob/main/work/capstone_report.md"
+          target="_blank" rel="noopener">Read Full Capstone Report →</a>
+        <a class="btn-secondary"
+          href="https://github.com/ShubhamSnSharma/flyrank-ml-internship/blob/main/work/notebooks/capstone.ipynb"
+          target="_blank" rel="noopener">View Notebook</a>
+        <a class="btn-secondary" href="https://github.com/ShubhamSnSharma/flyrank-ml-internship" target="_blank"
+          rel="noopener">GitHub Repository</a>
       </div>
     </div>
   </header>
 
-  <div class="wrap">
+  <!-- ABSTRACT -->
+  <section class="section-block" id="abstract" style="padding: 48px 0;">
+    <div class="wrap">
+      <span class="section-eyebrow">Abstract</span>
+      <p class="section-p" style="font-size: 15.5px;">
+        This investigation evaluates whether historical search-performance signals can help prioritize published
+        pages for human review of organic traffic decay. Using 16,513 eligible pages across 36 client domains, I
+        compared a transparent heuristic baseline with a standardized 9-feature Logistic Regression under
+        client-grouped validation. On the primary Seed 42 split, Precision@50 increased from 20.0% to 24.0%,
+        identifying 12 true declining pages among the top 50 compared with 10 from the baseline. Across five client
+        splits, mean lift was +1.6 percentage points, with observed lifts ranging from -12.0 to +14.0 pp. Exploratory
+        trajectory features produced a 74.0% single-split result, but this fell to a 54.8% &plusmn; 10.6% five-seed
+        mean and was therefore not selected as the final result. A controlled leakage test further demonstrated the
+        sensitivity of evaluation to future information.
+      </p>
+    </div>
+  </section>
 
-    <!-- Quick Links -->
-    <section class="links">
-      <div class="link-row">
-        <a class="link-primary"
+  <!-- 2. THE QUESTION -->
+  <section class="section-block" id="question">
+    <div class="wrap">
+      <span class="section-eyebrow">1. The Problem</span>
+      <h2 class="section-title">Can historical search signals help decide which pages editors should review first?</h2>
+      <p class="section-p">
+        Enterprise digital publishing teams manage thousands of published URLs, but editorial review bandwidth is
+        strictly limited. Editors cannot investigate every page with equal depth.
+      </p>
+      <p class="section-p">
+        The goal is not to automatically alter search settings or generate unreviewed copy. The goal is to rank pages so
+        human editorial teams can decide where to direct diagnostic attention first.
+      </p>
+
+      <!-- Simple Visual Flow -->
+      <div class="flow-track">
+        <span class="flow-node">Historical signals</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">Risk score</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">Ranked review queue</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node highlight">Human editorial review</span>
+      </div>
+
+      <p class="section-p" style="color: var(--muted); font-size: 14.5px;">
+        This establishes a decision-support system, not an autonomous SEO system.
+      </p>
+    </div>
+  </section>
+
+  <!-- 3. THE INVESTIGATION TIMELINE -->
+  <section class="section-block" id="investigation">
+    <div class="wrap">
+      <span class="section-eyebrow">2. What I Investigated</span>
+      <h2 class="section-title">I didn't start with the model.</h2>
+      <p class="section-p">
+        Machine learning adds maintenance complexity and failure modes. I followed a structured 7-stage engineering
+        investigation to verify whether added complexity earned its keep:
+      </p>
+
+      <!-- 7 Stage Editorial Timeline -->
+      <div class="investigation-timeline">
+        <div class="timeline-step">
+          <div class="timeline-num">01</div>
+          <h4>Define the Problem</h4>
+          <p>Prioritize URLs to direct finite editorial diagnostic bandwidth.</p>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-num">02</div>
+          <h4>Inspect Signals</h4>
+          <p>Audit search visibility, clicks, rankings, and user engagement.</p>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-num">03</div>
+          <h4>Build Baseline</h4>
+          <p>Construct a transparent, non-learned 3-signal heuristic rule.</p>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-num">04</div>
+          <h4>Try Supervised Models</h4>
+          <p>Train linear and tree-based classifiers on pre-May signals.</p>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-num">05</div>
+          <h4>Test Generalization</h4>
+          <p>Run client-grouped holdouts to see if gains survive across domains.</p>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-num">06</div>
+          <h4>Try to Break It</h4>
+          <p>Stress-test validation integrity via intentional future leakage.</p>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-num">07</div>
+          <h4>Human-Review Playbook</h4>
+          <p>Map scores to review archetypes with anti-automation guardrails.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. DEDICATED "EXPLORATORY INVESTIGATIONS" SECTION -->
+  <section class="section-block" id="exploratory-turn">
+    <div class="wrap">
+      <span class="section-eyebrow">3. The Exploratory Turn</span>
+      <h2 class="section-title">The investigations that changed the direction</h2>
+      <p class="section-p">
+        I didn't stop at the first result that looked good. I tested alternative feature representations, checked
+        whether high single-split scores held up across seeds, and stress-tested the evaluation framework:
+      </p>
+
+      <!-- 3 Investigation Cards Grid -->
+      <div class="grid-3col">
+        <!-- Card 1: Trajectory Features LR Peak -->
+        <div class="investigation-card exploratory">
+          <div>
+            <div class="inv-header">
+              <span class="inv-tag">Investigation 01</span>
+              <span class="badge badge-exploratory">Exploratory Investigation</span>
+            </div>
+            <h3>A 74% result appeared, but it did not generalize.</h3>
+            <p>
+              An exploratory Logistic Regression using <strong>13 velocity trajectory features</strong> (ratios, deltas,
+              acceleration) reached <strong>74.0% Precision@50</strong> (37 of the top 50 pages) on Seed 42. That
+              result looked promising, but it was not stable enough to become the final capstone model.
+            </p>
+            <p style="font-size: 12.5px; color: var(--muted);">
+              Across five seeds, the same trajectory Logistic Regression averaged <strong>54.8% &plusmn; 10.6%</strong>
+              Precision@50 (ranging from 44.0% to 74.0%).
+            </p>
+          </div>
+          <div>
+            <p style="font-size: 13px; color: var(--text); margin-bottom: 10px;">
+              <strong>The Engineering Decision:</strong> Because the score varied substantially by split, I kept it as
+              an exploratory finding rather than presenting 74% as a stable model result.
+            </p>
+            <div class="inv-metric-badge">
+              <strong>Seed 42 Peak:</strong> 74.0% · <strong>5-Seed Mean:</strong> 54.8% &plusmn; 10.6%
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Random Forest Prototype -->
+        <div class="investigation-card exploratory">
+          <div>
+            <div class="inv-header">
+              <span class="inv-tag">Investigation 02</span>
+              <span class="badge badge-exploratory">Exploratory Investigation</span>
+            </div>
+            <h3>Random Forest reduced variance across seeds.</h3>
+            <p>
+              An exploratory Random Forest (200 trees) evaluated on the 13 trajectory features achieved <strong>60.0%
+                Precision@50</strong> (30/50 true positives) on Seed 42.
+            </p>
+            <p style="font-size: 12.5px; color: var(--muted);">
+              Across five seeds (42, 123, 2026, 7, 99), Random Forest demonstrated lower variance, averaging
+              <strong>57.6% &plusmn; 9.3%</strong> (ranging from 42.0% to 70.0%).
+            </p>
+          </div>
+          <div>
+            <p style="font-size: 13px; color: var(--text); margin-bottom: 10px;">
+              <strong>The Engineering Takeaway:</strong> The Random Forest result was more stable than the single-split
+              Logistic Regression peak, but it still varied across client splits. This reinforced the need to evaluate
+              the feature representation and model together across multiple seeds.
+            </p>
+            <div class="inv-metric-badge">
+              <strong>Seed 42:</strong> 60.0% · <strong>5-Seed Mean:</strong> 57.6% &plusmn; 9.3%
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Controlled Leakage Stress Test -->
+        <div class="investigation-card leakage">
+          <div>
+            <div class="inv-header">
+              <span class="inv-tag">Investigation 03</span>
+              <span class="badge badge-leakage">Controlled Leakage Test</span>
+            </div>
+            <h3>Deliberately injecting future clicks broke the evaluation.</h3>
+            <p>
+              To test whether the validation pipeline catches temporal errors, I injected post-April May 2026 search
+              clicks directly into the feature set.
+            </p>
+            <p style="font-size: 12.5px; color: var(--muted);">
+              Clean Model: 0.2400 P@50 (AUC 0.4594)<br>
+              May Injected: 1.0000 P@50 (AUC 0.8921)
+            </p>
+          </div>
+          <div>
+            <p style="font-size: 13px; color: var(--text); margin-bottom: 10px;">
+              <strong>The Finding:</strong> The artificial jump to perfection demonstrated how future data can distort
+              evaluation, reinforcing why the final pipeline uses strict pre-May temporal quarantine.
+            </p>
+            <div class="inv-metric-badge">
+              <strong>Artificial Score:</strong> 1.0000 P@50 · 0.8921 ROC-AUC
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collapsed Disclosure for Other Exploratory Models -->
+      <details class="disclosure">
+        <summary>View other exploratory models evaluated on trajectory features (Decision Tree, Extra Trees, Boosting)
+        </summary>
+        <div class="disclosure-body">
+          <p style="margin-bottom: 10px;">
+            In <code>work/personal_investigations/ml08_modeling_investigation.ipynb</code>, multiple model families were
+            evaluated on the same 13 trajectory features under the Seed 42 held-out test split:
+          </p>
+          <table class="compact-table">
+            <thead>
+              <tr>
+                <th>Model Architecture</th>
+                <th>Feature Set</th>
+                <th>Precision@50 (Seed 42)</th>
+                <th>5-Seed Mean &plusmn; Std</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Logistic Regression</strong></td>
+                <td>Trajectory (13 features)</td>
+                <td class="mono">0.7400 (37/50)</td>
+                <td class="mono">0.5480 &plusmn; 0.1063</td>
+                <td><span class="badge badge-exploratory">Exploratory Peak</span></td>
+              </tr>
+              <tr>
+                <td><strong>Random Forest (200 trees)</strong></td>
+                <td>Trajectory (13 features)</td>
+                <td class="mono">0.6000 (30/50)</td>
+                <td class="mono">0.5760 &plusmn; 0.0933</td>
+                <td><span class="badge badge-exploratory">Exploratory</span></td>
+              </tr>
+              <tr>
+                <td><strong>HistGradientBoosting</strong></td>
+                <td>Trajectory (13 features)</td>
+                <td class="mono">0.5400 (27/50)</td>
+                <td class="mono">—</td>
+                <td><span class="badge badge-exploratory">Exploratory</span></td>
+              </tr>
+              <tr>
+                <td><strong>Decision Tree (depth=6)</strong></td>
+                <td>Trajectory (13 features)</td>
+                <td class="mono">0.4800 (24/50)</td>
+                <td class="mono">0.4400 &plusmn; 0.1220</td>
+                <td><span class="badge badge-exploratory">Exploratory</span></td>
+              </tr>
+              <tr>
+                <td><strong>Extra Trees (200 trees)</strong></td>
+                <td>Trajectory (13 features)</td>
+                <td class="mono">0.4600 (23/50)</td>
+                <td class="mono">—</td>
+                <td><span class="badge badge-exploratory">Exploratory</span></td>
+              </tr>
+              <tr>
+                <td><strong>Gradient Boosting</strong></td>
+                <td>Trajectory (13 features)</td>
+                <td class="mono">0.4600 (23/50)</td>
+                <td class="mono">—</td>
+                <td><span class="badge badge-exploratory">Exploratory</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="font-size: 11.5px; color: var(--muted); margin-top: 10px;">
+            *All exploratory trajectory models were evaluated on monthly-aggregate grain. The final capstone model
+            relies on the standardized 9-feature pre-May pipeline for locked reproducibility.
+          </p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- 5. FINAL LOCKED BASELINE & MODEL -->
+  <section class="section-block" id="baseline">
+    <div class="wrap">
+      <span class="section-eyebrow">4. Final Locked Capstone Model</span>
+      <h2 class="section-title">Before ML, I built a rule I could explain.</h2>
+      <p class="section-p">
+        To establish an interpretable benchmark, I built a non-learned heuristic baseline from three April signals:
+        GSC impressions, average search position, and GA4 pageviews. Each signal was converted into a daily binary
+        threshold flag (impressions &ge; 10, position &gt; 10, pageviews &ge; 1) and aggregated into a page-level
+        score.
+      </p>
+
+      <!-- Comparison Track -->
+      <div class="comp-bar-container">
+        <div class="comp-row">
+          <span class="comp-name">Heuristic Baseline</span>
+          <div class="comp-track">
+            <div class="comp-fill base"></div>
+          </div>
+          <span class="comp-score">20.0%</span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">Final Logistic Regression</span>
+          <div class="comp-track">
+            <div class="comp-fill model"></div>
+          </div>
+          <span class="comp-score accent">24.0%</span>
+        </div>
+      </div>
+
+      <p class="section-p">
+        <strong>Did ML beat a transparent rule?</strong> Yes, on the primary client-held-out test set (Seed 42): the
+        9-feature standardized Logistic Regression identified 12 true declining pages in the top 50 instead of 10 (+4.0
+        percentage-point lift).
+      </p>
+
+      <!-- Base Rate Context Box -->
+      <div class="card-box" style="margin: 18px 0; max-width: var(--content-width); background: var(--surface);">
+        <h4 style="font-size: 14px; margin-bottom: 4px;">Context: Test-Set Base Rate</h4>
+        <p style="font-size: 13.5px; color: var(--muted); line-height: 1.5;">
+          <strong>Test-set base rate: 38.7%</strong> of held-out pages met the decay label in May (the full eligible portfolio's base rate is 41.6%). Because the task is
+          top-50 candidate ranking for human editorial audit, the relevant comparison is how many true positives appear
+          in the prioritized queue (Precision@50), rather than whether the percentage exceeds overall portfolio
+          prevalence.
+        </p>
+      </div>
+
+      <!-- Expandable Baseline Details -->
+      <details class="disclosure">
+        <summary>Technical details: baseline rule definition and tie-breaking</summary>
+        <div class="disclosure-body">
+          <p style="margin-bottom: 8px;">The baseline score averages daily April flags per page:</p>
+          <code class="mono"
+            style="display: block; background: var(--code-bg); padding: 8px 12px; border-radius: 3px; margin-bottom: 8px;">
+            Daily Score = 1{gsc_impr &ge; 10} + 1{gsc_pos &gt; 10} + 1{ga4_pv &ge; 1}
+          </code>
+          <p style="color: var(--muted); font-size: 12px;">Deterministic tie-breaking: Score DESC &rarr; April Impr DESC
+            &rarr; April PV DESC &rarr; Position ASC &rarr; content_hash_id ASC.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- 6. CLIENT-GROUPED VALIDATION -->
+  <section class="section-block" id="validation">
+    <div class="wrap">
+      <span class="section-eyebrow">5. Validation Design & Stability Audit</span>
+      <h2 class="section-title">Does the result survive when whole clients are held out?</h2>
+      <p class="section-p">
+        Client-grouped validation was used because pages from the same client can share domain-specific taxonomy and
+        authority patterns that a random row-level split would not test as strictly. Using <code
+          class="mono">GroupShuffleSplit</code> (28 training clients &rarr; Model, 8 held-out clients &rarr; Evaluation)
+        across 5 repeated splits exposed substantial partition sensitivity:
+      </p>
+
+      <!-- 5 Split Results Strip -->
+      <div class="splits-container">
+        <div class="split-item primary">
+          <div class="split-seed-label">Seed 42 (Primary)</div>
+          <div class="split-lift-val pos">+4.0 pp</div>
+          <div class="split-subtext">0.20 &rarr; 0.24</div>
+        </div>
+        <div class="split-item">
+          <div class="split-seed-label">Seed 43</div>
+          <div class="split-lift-val pos">+14.0 pp</div>
+          <div class="split-subtext">0.14 &rarr; 0.28</div>
+        </div>
+        <div class="split-item">
+          <div class="split-seed-label">Seed 44</div>
+          <div class="split-lift-val neg">-12.0 pp</div>
+          <div class="split-subtext">0.56 &rarr; 0.44</div>
+        </div>
+        <div class="split-item">
+          <div class="split-seed-label">Seed 45</div>
+          <div class="split-lift-val neg">-8.0 pp</div>
+          <div class="split-subtext">0.56 &rarr; 0.48</div>
+        </div>
+        <div class="split-item">
+          <div class="split-seed-label">Seed 46</div>
+          <div class="split-lift-val pos">+10.0 pp</div>
+          <div class="split-subtext">0.16 &rarr; 0.26</div>
+        </div>
+      </div>
+
+      <!-- Zero-Line Diverging Lift Chart -->
+      <div class="lift-chart">
+        <div class="lift-row">
+          <span class="lift-label">Seed 42</span>
+          <div class="lift-track">
+            <div class="lift-zero"></div>
+            <div class="lift-bar pos" style="width: 14.3%;"></div>
+          </div>
+          <span class="lift-val pos">+4.0 pp</span>
+        </div>
+        <div class="lift-row">
+          <span class="lift-label">Seed 43</span>
+          <div class="lift-track">
+            <div class="lift-zero"></div>
+            <div class="lift-bar pos" style="width: 50.0%;"></div>
+          </div>
+          <span class="lift-val pos">+14.0 pp</span>
+        </div>
+        <div class="lift-row">
+          <span class="lift-label">Seed 44</span>
+          <div class="lift-track">
+            <div class="lift-zero"></div>
+            <div class="lift-bar neg" style="width: 42.9%;"></div>
+          </div>
+          <span class="lift-val neg">-12.0 pp</span>
+        </div>
+        <div class="lift-row">
+          <span class="lift-label">Seed 45</span>
+          <div class="lift-track">
+            <div class="lift-zero"></div>
+            <div class="lift-bar neg" style="width: 28.6%;"></div>
+          </div>
+          <span class="lift-val neg">-8.0 pp</span>
+        </div>
+        <div class="lift-row">
+          <span class="lift-label">Seed 46</span>
+          <div class="lift-track">
+            <div class="lift-zero"></div>
+            <div class="lift-bar pos" style="width: 35.7%;"></div>
+          </div>
+          <span class="lift-val pos">+10.0 pp</span>
+        </div>
+        <div class="lift-axis-labels">
+          <span></span>
+          <span>&larr; underperforms baseline &nbsp;|&nbsp; 0 pp &nbsp;|&nbsp; beats baseline &rarr;</span>
+          <span></span>
+        </div>
+      </div>
+      <p class="section-p" style="font-size: 13px; color: var(--muted); margin-top: -8px;">
+        The model does not consistently beat the baseline — it wins on 3 of 5 client partitions and loses on 2.
+      </p>
+
+      <div class="grid-2col">
+        <div class="card-box">
+          <h4>Key Validation Takeaway</h4>
+          <p>
+            The model <strong>improved in 3 of 5 splits</strong> and underperformed in 2. The primary +4.0 pp lift is
+            meaningful evidence on that split, but repeated validation showed that performance varies across client
+            portfolios.
+          </p>
+        </div>
+        <div class="card-box">
+          <h4>5-Split Aggregate Metrics</h4>
+          <p>
+            • Baseline 5-Split Mean: <span class="mono">0.3240 &plusmn; 0.2165</span><br>
+            • LR Model 5-Split Mean: <span class="mono">0.3400 &plusmn; 0.1114</span><br>
+            • Mean Split Lift: <span class="mono" style="color: var(--green); font-weight: 700;">+0.0160 &plusmn; 0.1126
+              (+1.6 pp)</span><br>
+            • Observed Lift Range: <span class="mono">-12.0 pp to +14.0 pp</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. LEAKAGE TEST -->
+  <section class="section-block" id="leakage">
+    <div class="wrap">
+      <span class="section-eyebrow">6. Evaluation Integrity</span>
+      <h2 class="section-title">I also tried to break the evaluation.</h2>
+      <p class="section-p">
+        To test whether the validation framework detects subtle leakage, I ran an intentional stress test injecting
+        post-April (May 2026) search clicks into the feature set:
+      </p>
+
+      <!-- Clean vs Leaky Comparison -->
+      <div class="comp-bar-container">
+        <div class="comp-row">
+          <span class="comp-name">Clean Model</span>
+          <div class="comp-track">
+            <div class="comp-fill model"></div>
+          </div>
+          <span class="comp-score">0.2400</span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">May Data Injected</span>
+          <div class="comp-track">
+            <div class="comp-fill leak"></div>
+          </div>
+          <span class="comp-score" style="color: #4A5568;">1.0000</span>
+        </div>
+      </div>
+
+      <p class="section-p">
+        Injecting future clicks produced a perfect 1.0000 Precision@50 in the controlled leakage test (ROC-AUC rose
+        from 0.4594 to 0.8921). The score improved because future information entered the features, not because the
+        model became better — which is exactly why the final pipeline uses strict pre-May temporal quarantine.
+      </p>
+
+      <!-- Valid vs Invalid Evaluation Diagram -->
+      <div class="grid-2col" style="margin-top: 18px;">
+        <div class="card-box" style="border-left: 3px solid var(--green);">
+          <h4 style="color: var(--green);">Valid Evaluation</h4>
+          <p style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.9; margin: 0;">
+            Pre-May features<br>
+            &darr;<br>
+            Model<br>
+            &darr;<br>
+            May outcome<br>
+            &darr;<br>
+            <strong style="color: var(--charcoal);">0.2400 P@50</strong>
+          </p>
+        </div>
+        <div class="card-box" style="border-left: 3px solid var(--rust);">
+          <h4 style="color: var(--rust);">Invalid Evaluation</h4>
+          <p style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.9; margin: 0;">
+            Pre-May features + May clicks<br>
+            &darr;<br>
+            Model<br>
+            &darr;<br>
+            May outcome<br>
+            &darr;<br>
+            <strong style="color: var(--rust);">1.0000 P@50</strong>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. WHAT THE FINAL MODEL ACTUALLY DOES -->
+  <section class="section-block" id="use">
+    <div class="wrap">
+      <span class="section-eyebrow">7. Operational Role</span>
+      <h2 class="section-title">So what is the model actually useful for?</h2>
+      <p class="section-p">
+        The model ranks pages by estimated probability of the observed decay label, using historical pre-May signals.
+        The resulting ranking is intended to prioritize human diagnostic review — not to establish that a page will
+        actually recover traffic after intervention.
+      </p>
+
+      <div class="flow-track">
+        <span class="flow-node">Model score</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">Priority</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">Human diagnosis</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node highlight">Editorial action</span>
+      </div>
+
+      <div class="grid-2col">
+        <div class="card-box">
+          <h4>What the Model Does</h4>
+          <p>
+            • Ranks URLs by predicted decline probability<br>
+            • Groups pages into structured diagnostic archetypes<br>
+            • Highlights high-volume and striking-distance candidates
+          </p>
+        </div>
+        <div class="card-box">
+          <h4>What the Model Does NOT Do</h4>
+          <p>
+            • Rewrite page copy or generate autonomous text<br>
+            • Execute programmatic 301 redirects or canonical tags<br>
+            • Automatically delete or prune URLs
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. ACTION PLAYBOOK -->
+  <section class="section-block" id="playbook">
+    <div class="wrap">
+      <span class="section-eyebrow">8. Decision-Support Playbook</span>
+      <h2 class="section-title">From model scores to editorial planning.</h2>
+      <p class="section-p">
+        The ML-10 Action Playbook maps predicted probabilities into 5 review archetypes and priority tiers across the
+        16,513-page portfolio.
+      </p>
+
+      <!-- Key High-Level Portfolio Metrics -->
+      <div class="hero-stats-grid" style="margin-bottom: 20px;">
+        <div class="hero-stat-card">
+          <div class="hero-stat-num">16,513</div>
+          <div class="hero-stat-label">Total Portfolio Pages Scored</div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="hero-stat-num" style="color: var(--rust);">2,373</div>
+          <div class="hero-stat-label">P1 High Priority Queue (P &ge; 0.60)</div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="hero-stat-num">272</div>
+          <div class="hero-stat-label">Senior Review Signoff Queue (P &ge; 0.70)</div>
+        </div>
+      </div>
+
+      <!-- Expandable Playbook Charts and Data -->
+      <details class="disclosure">
+        <summary>View portfolio breakdown, archetypes, and workload figures</summary>
+        <div class="disclosure-body">
+          <div class="grid-2col" style="margin-top: 6px;">
+            <div class="card-box">
+              <h4>5 Action Archetypes</h4>
+              <p>
+                • <strong>High Search Impr / Thin Traffic:</strong> 7,181 pages (43.5%) · ~3.5h<br>
+                • <strong>Lower-Priority Monitoring:</strong> 4,084 pages (24.7%) · ~0.5h<br>
+                • <strong>Striking Distance / Search Visibility:</strong> 3,603 pages (21.8%) · ~2.0h<br>
+                • <strong>High Traffic / Higher Decay Risk:</strong> 1,216 pages (7.4%) · ~5.0h<br>
+                • <strong>General Higher-Decline Risk:</strong> 429 pages (2.6%) · ~3.0h
+              </p>
+            </div>
+            <div class="card-box">
+              <h4>Priority Tiers & Workload</h4>
+              <p>
+                • <strong>P1_High_Priority (P &ge; 0.60):</strong> 2,373 pages (8,063.5h)<br>
+                • <strong>P2_Review (0.45 &le; P &lt; 0.60):</strong> 8,655 pages<br>
+                • <strong>P3_Monitor (P &lt; 0.45):</strong> 5,485 pages<br>
+                • <strong>Senior Review Queue (P &ge; 0.70):</strong> 272 pages
+              </p>
+            </div>
+          </div>
+
+          <div class="fig-grid">
+            <div class="fig-item">
+              <img src="figures/action_archetype_distribution.png" alt="Archetype Distribution across Priority Tiers" />
+              <div class="fig-caption">Figure 1: Distribution of Action Archetypes across Portfolio Priority Tiers.
+              </div>
+            </div>
+            <div class="fig-item">
+              <img src="figures/effort_vs_risk_matrix.png" alt="Effort vs Risk Matrix" />
+              <div class="fig-caption">Figure 2: Review Effort vs Model Decay Risk Matrix (272-page senior queue).</div>
+            </div>
+          </div>
+          <p style="font-size: 11.5px; color: var(--muted); margin-top: 10px;">
+            *Scoring across the 16,513-page portfolio uses in-sample predicted probabilities for triage illustration —
+            these are not calibrated out-of-sample estimates. Effort hours (166.5h Top-50 / 41,748.5h Total) are
+            planning heuristics, not accounting costs.
+          </p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- 10. WHAT I LEARNED -->
+  <section class="section-block" id="learnings">
+    <div class="wrap">
+      <span class="section-eyebrow">9. Engineering Takeaways</span>
+      <h2 class="section-title">What the investigation changed my mind about</h2>
+      <p class="section-p">
+        Rigorous machine learning engineering is defined by testing assumptions against empirical reality:
+      </p>
+
+      <div class="grid-2col">
+        <div class="card-box">
+          <h4>1. Complex Models Don't Guarantee Generalization</h4>
+          <p>In this investigation, the simpler final model produced a more conservative result than earlier exploratory
+            models, while repeated client-grouped validation showed that even the final lift was partition-sensitive.
+          </p>
+        </div>
+        <div class="card-box">
+          <h4>2. Grouped Validation Exposes Hidden Instability</h4>
+          <p>Client-grouped validation was used because pages from the same client can share domain-specific patterns
+            that a random row-level split would not test as strictly.</p>
+        </div>
+        <div class="card-box">
+          <h4>3. Future Leakage Creates Artificial Excellence</h4>
+          <p>Injecting post-decision clicks produced a perfect 1.0000 Precision@50 in this stress test, showing why
+            temporal feature quarantine matters.</p>
+        </div>
+        <div class="card-box">
+          <h4>4. Triage Ranking Value Differs from Autonomous Accuracy</h4>
+          <p>The result supports using the model as a candidate-ranking experiment for human review, rather than as an
+            autonomous decision system.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. SAFETY + LIMITATIONS -->
+  <section class="section-block" id="safety">
+    <div class="wrap">
+      <span class="section-eyebrow">10. Safety & Limits</span>
+      <h2 class="section-title">A model score does not authorize a CMS change.</h2>
+
+      <div class="safety-block">
+        <div class="guardrail-token">MODEL_SCORE_DOES_NOT_AUTHORIZE_REDIRECT_OR_CANONICAL_CHANGE</div>
+        <p class="section-p" style="margin-bottom: 0; font-size: 14.5px;">
+          Scores prioritize human diagnostic review. They do not trigger rewriting, redirects, canonical changes,
+          deletion, or other autonomous CMS actions.
+        </p>
+      </div>
+
+      <div class="grid-2col">
+        <div class="card-box">
+          <h4>Methodological Limitations</h4>
+          <p>
+            • <strong>Partition sensitivity:</strong> Lift varied between -12.0 pp and +14.0 pp across client
+            partitions.<br>
+            • <strong>Not causal:</strong> Statistical associations do not establish that refreshing a page will recover
+            traffic.
+          </p>
+        </div>
+        <div class="card-box">
+          <h4>Evaluation Scope</h4>
+          <p>
+            • <strong>Top-50 metric focus:</strong> Precision@50 evaluates the top triage queue, not full-portfolio
+            calibration.<br>
+            • <strong>In-sample playbook queue:</strong> Full-portfolio scores are generated in-sample for decision
+            triage illustration.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12. EVIDENCE / REPRODUCIBILITY -->
+  <section class="section-block" id="evidence">
+    <div class="wrap">
+      <span class="section-eyebrow">11. Reproducibility & Research Artifacts</span>
+      <h2 class="section-title">Follow the evidence.</h2>
+      <p class="section-p">
+        The core metrics and analysis results can be traced to the repository notebooks and supporting artifacts:
+      </p>
+
+      <div class="flow-track" style="font-size: 12px; padding: 12px 18px; margin-bottom: 24px;">
+        <span>ML-02 Question</span> &rarr;
+        <span>ML-03 Task</span> &rarr;
+        <span>ML-04/05 Data</span> &rarr;
+        <span>ML-06/07 Baseline</span> &rarr;
+        <span>ML-08 Model</span> &rarr;
+        <span>ML-09 Validation</span> &rarr;
+        <span>ML-10 Playbook</span> &rarr;
+        <span style="color: var(--rust); font-weight: 700;">ML-11 Capstone</span>
+      </div>
+
+      <!-- Links Row -->
+      <div class="hero-actions" style="margin-bottom: 24px;">
+        <a class="btn-primary"
           href="https://github.com/ShubhamSnSharma/flyrank-ml-internship/blob/main/work/capstone_report.md"
           target="_blank" rel="noopener">Read Full Capstone Report →</a>
-        <a class="link-secondary"
+        <a class="btn-secondary"
           href="https://github.com/ShubhamSnSharma/flyrank-ml-internship/blob/main/work/notebooks/capstone.ipynb"
           target="_blank" rel="noopener">Executed Capstone Notebook</a>
-        <a class="link-secondary"
-          href="https://github.com/ShubhamSnSharma/flyrank-ml-internship/blob/main/work/notebooks/w06_validation_audit.ipynb"
-          target="_blank" rel="noopener">W06 Validation Audit</a>
-        <a class="link-secondary"
-          href="https://github.com/ShubhamSnSharma/flyrank-ml-internship/blob/main/work/notebooks/w07_action_playbook.ipynb"
-          target="_blank" rel="noopener">W07 Action Playbook</a>
-        <a class="link-secondary" href="https://github.com/ShubhamSnSharma/flyrank-ml-internship" target="_blank"
+        <a class="btn-secondary" href="https://github.com/ShubhamSnSharma/flyrank-ml-internship" target="_blank"
           rel="noopener">GitHub Repository</a>
       </div>
-      <div class="link-note">
-        All notebook code executed reproducibly against DuckDB and Scikit-Learn pipelines using client-holdout splits.
-      </div>
-    </section>
 
-    <!-- 1. Problem Framing -->
-    <section class="content-block" id="framing">
-      <div class="section-head">
-        <span class="label">1. Problem Framing & Operational Decision</span>
-        <span class="count">ML-03</span>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <span class="tag">Decision Supported</span>
-          <h3>Prioritizing Diagnostic Editorial Attention</h3>
-          <p>
-            In enterprise digital publishing, organizations manage content portfolios spanning thousands of URLs.
-            Organic search traffic fluctuates over time, but editorial teams operate under strictly finite diagnostic
-            bandwidth and cannot manually investigate every page with equal depth.
-          </p>
-          <p>
-            This system supports <strong>candidate queue prioritization for human editorial content review</strong>. The
-            model outputs a predicted likelihood of organic search traffic decay to rank pages, enabling editors to
-            allocate structured diagnostic review where empirical vulnerability signals are concentrated.
-          </p>
-
-          <div class="workflow-strip">
-            <span class="workflow-step">Model Signal</span>
-            <span class="workflow-arrow">→</span>
-            <span class="workflow-step">Review Priority</span>
-            <span class="workflow-arrow">→</span>
-            <span class="workflow-step">Human Diagnosis</span>
-            <span class="workflow-arrow">→</span>
-            <span class="workflow-step">Editorial Action</span>
-          </div>
-        </div>
-
-        <div class="card">
-          <span class="tag muted-tag">Operating Asymmetry</span>
-          <h3>Unit of Analysis & Evaluation Grain</h3>
-          <ul>
-            <li><strong>Unit of Analysis:</strong> Published URL (<code>content_hash_id</code>) within client
-              (<code>client_hash_id</code>) evaluated over May 1–31, 2026.</li>
-            <li><strong>Target Outcome:</strong> Binary indicator if May clicks drop by &ge; 20% relative to April.</li>
-            <li><strong>Evaluation Metric:</strong> <strong>Precision@50</strong> (proportion of true declining pages in
-              the top 50 ranked candidates).</li>
-            <li><strong>False Positive Cost:</strong> Allocates ~2–5h of planning diagnostic effort to a page that stays
-              above the decay threshold.</li>
-            <li><strong>False Negative Cost:</strong> Lower review priority for a declining page.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- 2. Data Safety & Baseline -->
-    <section class="content-block" id="data">
-      <div class="section-head">
-        <span class="label">2. Data Safety & Transparent Baseline</span>
-        <span class="count">ML-04 · ML-07</span>
-      </div>
-
-      <div class="grid-equal">
-        <div class="card">
-          <span class="tag">Data Contract & Leakage Boundaries</span>
-          <h3>79M+ Rows of Enterprise Search Data</h3>
-          <p>
-            The dataset covers 79M+ rows of FlyRank enterprise search-performance data across the warehouse client population (<code>fact_content_daily_performance</code> table, build
-            <code>v20260703</code>). To focus on pages with measurable search presence, we applied two activity-based
-            criteria:
-          </p>
-          <ul>
-            <li><strong>GSC Impressions (Feb–Apr) &ge; 1,000</strong></li>
-            <li><strong>GSC Clicks (Apr) &ge; 10</strong></li>
-          </ul>
-          <p>
-            Yields <strong>N = 16,513 eligible pages across 36 client domains</strong> (Portfolio base rate = 41.62% decline).
-            Historical features are strictly bounded to Feb 1 – Apr 30, 2026, quarantined from May 1–31 forward outcomes.
-          </p>
-          <p class="muted">
-            The published analysis and repository artifacts contain no client domain names, raw URLs, private search
-            queries, or personally identifiable information.
-          </p>
-        </div>
-
-        <div class="card">
-          <span class="tag">Non-Learned Benchmark</span>
-          <h3>Week 4 Heuristic Baseline Rule</h3>
-          <p>
-            To establish a transparent, non-learned benchmark, the baseline averages daily April signals: GSC
-            impressions &ge; 10, average position &gt; 10, and GA4 pageviews &ge; 1.
-          </p>
-
-          <div class="formula-box">
-            Daily Score = 1{gsc_impressions &ge; 10} + 1{gsc_avg_position &gt; 10} + 1{ga4_pageviews &ge; 1}
-            Baseline Score = mean(Daily Score across April records)
-          </div>
-
-          <p>
-            <strong>Deterministic Tie-Breaking Cascade:</strong><br>
-            <code>Score DESC → April Impr DESC → April Pageviews DESC → Avg Position ASC → content_hash_id ASC</code>
-          </p>
-          <p>
-            <strong>Primary Split Result:</strong> Precision@50 = <strong>0.2000</strong> (10/50 true declining pages).
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- 3. Model & Validation -->
-    <section class="content-block" id="model">
-      <div class="section-head">
-        <span class="label">3. Supervised Model & Client-Grouped Validation Audit</span>
-        <span class="count">ML-08 · ML-09</span>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <span class="tag">Supervised Classification</span>
-          <h3>Standardized Logistic Regression</h3>
-          <p>
-            Trained a linear pipeline (<code>StandardScaler</code> +
-            <code>LogisticRegression(class_weight="balanced", random_state=42)</code>) across 9 pre-May modeling features (5 continuous with log transforms + 4 platform availability flags).
-          </p>
-
-          <table class="data-table">
+      <!-- Expandable Technical Feature Coefficients -->
+      <details class="disclosure">
+        <summary>Technical details: view all nine features and standardized coefficients</summary>
+        <div class="disclosure-body">
+          <table class="compact-table">
             <thead>
               <tr>
                 <th>Feature Name</th>
                 <th>Standardized Coef.</th>
-                <th>Model Interpretation</th>
+                <th>Directional Association</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td><code>log_ga4_pageviews_feb_apr</code></td>
                 <td class="mono">-0.9394</td>
-                <td>High historical consumption associates with lower decay risk</td>
+                <td>Higher traffic associates with lower relative decay risk</td>
               </tr>
               <tr>
                 <td><code>ga4_data_available</code></td>
                 <td class="mono">+0.7060</td>
-                <td>Active GA4 tracking indicator signal</td>
+                <td>Active tracking configuration indicator</td>
               </tr>
               <tr>
                 <td><code>gsc_avg_position_apr</code></td>
                 <td class="mono">+0.3212</td>
-                <td>Lower rank (higher position number) associates with decay</td>
+                <td>Lower ranking (higher position #) associates with decay</td>
               </tr>
               <tr>
                 <td><code>log_gsc_clicks_apr</code></td>
                 <td class="mono">+0.2807</td>
-                <td>Higher April clicks associates with meeting decay threshold</td>
-              </tr>
-              <tr>
-                <td><code>log_ga4_engaged_sessions</code></td>
-                <td class="mono">+0.2483</td>
-                <td>Historical engagement volume indicator</td>
-              </tr>
-              <tr>
-                <td><code>log_gsc_impressions_feb_apr</code></td>
-                <td class="mono">-0.1065</td>
-                <td>Broad search visibility moderation</td>
+                <td>April search click volume indicator</td>
               </tr>
               <tr>
                 <td><code>client_has_ga4</code></td>
-                <td class="mono">+0.0963</td>
-                <td>Platform configuration flag</td>
+                <td class="mono">-0.1751</td>
+                <td>Client-level platform configuration flag</td>
               </tr>
               <tr>
-                <td><code>gsc_data_available</code> / <code>client_has_gsc</code></td>
+                <td><code>log_ga4_engaged_sessions_feb_apr</code></td>
+                <td class="mono">+0.0446</td>
+                <td>Engagement session volume</td>
+              </tr>
+              <tr>
+                <td><code>log_gsc_impressions_feb_apr</code></td>
+                <td class="mono">-0.0231</td>
+                <td>Broad search appearance volume</td>
+              </tr>
+              <tr>
+                <td><code>client_has_gsc</code></td>
                 <td class="mono">+0.0000</td>
-                <td>Constant across eligible cohort (100% active)</td>
+                <td>Constant in eligible cohort (100%)</td>
+              </tr>
+              <tr>
+                <td><code>gsc_data_available</code></td>
+                <td class="mono">+0.0000</td>
+                <td>Constant in eligible cohort (100%)</td>
               </tr>
             </tbody>
           </table>
-          <p class="muted">
-            Coefficients reflect directional associations in the training set, not causal mechanisms.
-          </p>
+          <p style="font-size: 11.5px; color: var(--muted); margin-top: 8px;">*Coefficients reflect statistical
+            associations in the training set, not causal mechanisms.</p>
         </div>
+      </details>
+    </div>
+  </section>
 
-        <div class="card">
-          <span class="tag">Validation Stability Audit</span>
-          <h3>5 Repeated Client-Grouped Splits</h3>
-          <p>
-            Split strictly by client (<code>GroupShuffleSplit</code>, test_size=0.20, 8 held-out clients) to prevent
-            client-taxonomy leakage.
-          </p>
-
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Split Seed</th>
-                <th>Held-Out Pages</th>
-                <th>Baseline</th>
-                <th>Logistic Reg.</th>
-                <th>Lift</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="highlight-row">
-                <td>Seed 42 (Primary)</td>
-                <td>1,727</td>
-                <td class="mono">0.2000 (10/50)</td>
-                <td class="mono">0.2400 (12/50)</td>
-                <td class="mono">+0.0400 (+4.0 pp)</td>
-              </tr>
-              <tr>
-                <td>Seed 43</td>
-                <td>6,324</td>
-                <td class="mono">0.1400 (7/50)</td>
-                <td class="mono">0.2800 (14/50)</td>
-                <td class="mono">+0.1400 (+14.0 pp)</td>
-              </tr>
-              <tr>
-                <td>Seed 44</td>
-                <td>4,763</td>
-                <td class="mono">0.5600 (28/50)</td>
-                <td class="mono">0.4400 (22/50)</td>
-                <td class="mono">-0.1200 (-12.0 pp)</td>
-              </tr>
-              <tr>
-                <td>Seed 45</td>
-                <td>802</td>
-                <td class="mono">0.5600 (28/50)</td>
-                <td class="mono">0.4800 (24/50)</td>
-                <td class="mono">-0.0800 (-8.0 pp)</td>
-              </tr>
-              <tr>
-                <td>Seed 46</td>
-                <td>3,796</td>
-                <td class="mono">0.1600 (8/50)</td>
-                <td class="mono">0.2600 (13/50)</td>
-                <td class="mono">+0.1000 (+10.0 pp)</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div class="formula-box">
-            Baseline 5-Split Mean: 0.3240 ± 0.2165 (0.1400 to 0.5600)
-            LR Model 5-Split Mean: 0.3400 ± 0.1114 (0.2400 to 0.4800)
-            Mean Split Lift: +0.0160 ± 0.1126 (-12.0 pp to +14.0 pp)
-          </div>
-
-          <p class="muted">
-            <strong>Key Finding:</strong> LR outperformed baseline in 3 of 5 splits and underperformed in 2. The +4.0 pp
-            lift on Seed 42 is partition-sensitive rather than a uniform performance guarantee.
-          </p>
-        </div>
+  <!-- SITE FOOTER -->
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <div>
+        <strong>FlyRank ML Engineering Internship Capstone</strong> · Shubham Sharma (2026)<br>
+        Search-performance data warehouse provided by <a href="https://flyrank.ai/" target="_blank" rel="noopener"
+          style="text-decoration: underline;">FlyRank.ai</a>
       </div>
-
-      <!-- Leakage & Error Analysis Grid -->
-      <div class="grid-equal" style="margin-top: 24px;">
-        <div class="card">
-          <span class="tag">Controlled Leakage Audit</span>
-          <h3>Future Information Injection Check</h3>
-          <p>
-            To verify validation integrity, we ran a controlled leakage test injecting post-April (May 2026) search
-            clicks into feature matrices:
-          </p>
-          <ul>
-            <li><strong>Clean W05 Model:</strong> Precision@50 = <strong>0.2400</strong> (12/50) | ROC-AUC: 0.4594</li>
-            <li><strong>Leaky Model (May Injected):</strong> Precision@50 = <strong>1.0000</strong> (50/50) | ROC-AUC:
-              0.8921</li>
-          </ul>
-          <p class="muted">
-            The artificial performance jump demonstrates why strict temporal boundaries between historical feature
-            windows and outcome evaluation windows are essential.
-          </p>
-        </div>
-
-        <div class="card">
-          <span class="tag">Top-Queue Error Analysis</span>
-          <h3>Inspection of False Positives (Seed 42)</h3>
-          <p>
-            At Precision@50 = 0.2400 on the held-out test set:
-          </p>
-          <ul>
-            <li><strong>True Positives (12 / 50, 24%):</strong> Correctly flagged pages experiencing &ge; 20% click
-              decay.</li>
-            <li><strong>False Positives (38 / 50, 76%):</strong> Top-ranked pages that did not meet the study's May
-              decline label.</li>
-          </ul>
-          <p class="muted">
-            The false-positive analysis shows that several highly ranked candidates did not meet the study's May
-            decline label, reinforcing that the model's ranking signal should be treated as a review-prioritization aid
-            rather than a diagnosis.
-          </p>
-        </div>
+      <div>
+        <a href="https://github.com/ShubhamSnSharma/flyrank-ml-internship" target="_blank" rel="noopener"
+          style="color: var(--rust); font-weight: 600;">GitHub Repository →</a>
       </div>
-    </section>
-
-    <!-- 4. Action Playbook -->
-    <section class="content-block" id="playbook">
-      <div class="section-head">
-        <span class="label">4. Decision-Support Action Playbook</span>
-        <span class="count">ML-10</span>
-      </div>
-
-      <p style="font-size: 15px; margin-bottom: 20px; max-width: 75ch;">
-        Model predictions are translated into an actionable decision-support triage queue across 5 illustrative review
-        archetypes, explainable reason codes, and planning effort assumptions. Scoring across the 16,513-page portfolio
-        uses in-sample training scores for queue generation, disclosed as a decision-support artifact.
-      </p>
-
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Review Archetype</th>
-            <th>Portfolio Pages</th>
-            <th>Trigger Heuristic</th>
-            <th>Recommended Human Action</th>
-            <th>Planning Effort</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>High Search Impression / Thin Traffic</strong></td>
-            <td class="mono">7,181 (43.5%)</td>
-            <td>April Impr &ge; 1,000, GA4 PV &lt; 50</td>
-            <td>Review CTR, search intent alignment, content depth, internal links</td>
-            <td class="mono">~3.5 hrs</td>
-          </tr>
-          <tr>
-            <td><strong>Lower-Priority / Routine Monitoring</strong></td>
-            <td class="mono">4,084 (24.7%)</td>
-            <td>No specific elevated review signal</td>
-            <td>Routine scheduled editorial maintenance</td>
-            <td class="mono">~0.5 hrs</td>
-          </tr>
-          <tr>
-            <td><strong>Striking Distance / Search Visibility</strong></td>
-            <td class="mono">3,603 (21.8%)</td>
-            <td>8.0 &le; Pos &le; 20.0, April Impr &ge; 500</td>
-            <td>Review title/meta, SERP competitor gap, page structure</td>
-            <td class="mono">~2.0 hrs</td>
-          </tr>
-          <tr>
-            <td><strong>High Historical Traffic / Higher Decay Risk</strong></td>
-            <td class="mono">1,216 (7.4%)</td>
-            <td>GA4 PV &ge; 100, P(decay) &ge; 0.45</td>
-            <td>Review factual freshness, content depth, intent shift, technical issues</td>
-            <td class="mono">~5.0 hrs</td>
-          </tr>
-          <tr>
-            <td><strong>General Higher-Decline-Risk Review</strong></td>
-            <td class="mono">429 (2.6%)</td>
-            <td>P(decay) &ge; 0.50 (no specific rule)</td>
-            <td>Prioritize diagnostic review of traffic patterns and on-page content</td>
-            <td class="mono">~3.0 hrs</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <!-- Playbook Artifact Figures Grid -->
-      <div class="grid-equal" style="margin-top: 24px;">
-        <div class="figure-container">
-          <img src="figures/action_archetype_distribution.png"
-            alt="Action Archetype Distribution across Portfolio Priority Tiers" />
-          <div class="figure-caption">
-            <strong>Figure 1:</strong> Content Action Playbook Archetype Distribution across Portfolio Priority Tiers (P1:
-            2,373 pages, P2: 8,655 pages, P3: 5,485 pages).
-          </div>
-        </div>
-
-        <div class="figure-container">
-          <img src="figures/effort_vs_risk_matrix.png" alt="Decision Support: Review Effort vs. Model Decay Risk Matrix" />
-          <div class="figure-caption">
-            <strong>Figure 2:</strong> Editorial Review Effort vs. Model Predicted Decay Probability Matrix. Highlights
-            the 272-page Senior Review queue (P &ge; 0.70).
-          </div>
-        </div>
-      </div>
-
-      <div class="grid-3" style="margin-top: 20px;">
-        <div class="card">
-          <span class="tag">Priority Tiers</span>
-          <h4>Portfolio Workload</h4>
-          <ul>
-            <li><strong>P1_High_Priority (P &ge; 0.60):</strong> 2,373 pages (14.4%) — 8,063.5h planning effort</li>
-            <li><strong>P2_Review (0.45 &le; P &lt; 0.60):</strong> 8,655 pages (52.4%)</li>
-            <li><strong>P3_Monitor (P &lt; 0.45):</strong> 5,485 pages (33.2%)</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <span class="tag">Governance Threshold</span>
-          <h4>Senior Signoff Queue</h4>
-          <ul>
-            <li><strong>Threshold:</strong> P(decay) &ge; 0.70</li>
-            <li><strong>Queue Size:</strong> <strong>272 pages</strong> across portfolio</li>
-            <li><strong>Requirement:</strong> Mandatory senior editor review before structural CMS modifications</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <span class="tag muted-tag">Effort Totals</span>
-          <h4>Illustrative Planning Hours</h4>
-          <ul>
-            <li><strong>Top-50 Queue:</strong> 166.5 hours</li>
-            <li><strong>Total Portfolio:</strong> 41,748.5 hours</li>
-            <li>Planning heuristic for staffing estimation, not measured accounting costs.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- 5. Safety & Limitations -->
-    <section class="content-block" id="safety">
-      <div class="section-head">
-        <span class="label">5. Human-in-the-Loop Safety & Methodological Limits</span>
-        <span class="count">ML-10 · ML-11</span>
-      </div>
-
-      <div class="grid-equal">
-        <div class="card">
-          <span class="tag">Safety Guardrails</span>
-          <h3>The Anti-Automation No-Go List</h3>
-          <p>
-            The system enforces universal safety guardrails:
-            <code>MODEL_SCORE_DOES_NOT_AUTHORIZE_REDIRECT_OR_CANONICAL_CHANGE</code>.
-          </p>
-          <ul>
-            <li><strong>No Autonomous LLM Rewriting:</strong> Model outputs must never trigger unsupervised automated
-              content regeneration or publishing.</li>
-            <li><strong>No Programmatic Redirects:</strong> High decay probability cannot trigger automated 301 redirects
-              or canonical tags.</li>
-            <li><strong>No Automated Page Deletion:</strong> Low traffic signals must never trigger automated URL pruning
-              or unpublishing.</li>
-            <li><strong>Mandatory Senior Signoff:</strong> Pages with P &ge; 0.70 or in sensitive YMYL domains require
-              senior editorial oversight.</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <span class="tag muted-tag">Limitations</span>
-          <h3>What This Work Cannot Claim</h3>
-          <ul>
-            <li><strong>Association &ne; Causation:</strong> The model identifies statistical correlations in historical
-              search data; it cannot establish that a specific content edit will causally reverse decay.</li>
-            <li><strong>Partition Sensitivity:</strong> Lift varied between -12.0 pp and +14.0 pp across client
-              partitions. The single-split +4.0 pp lift is not a universal guarantee.</li>
-            <li><strong>High False Positive Rate:</strong> At 24% Precision@50, 38 of 50 candidates do not decline &ge;
-              20%. The tool is strictly for candidate triage, not automated diagnosis.</li>
-            <li><strong>No Search Algorithm Reverse-Engineering:</strong> The system models historical performance in
-              this dataset, not Google's proprietary ranking algorithm.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- 6. Engineering Trajectory -->
-    <section class="content-block">
-      <div class="section-head">
-        <span class="label">6. Engineering Trajectory (ML-02 → ML-11)</span>
-        <span class="count">W01 → W07 → Capstone</span>
-      </div>
-
-      <div class="journey-timeline">
-        <div class="journey-card">
-          <span class="step-num">Week 1 · ML-02</span>
-          <h4>Research Question</h4>
-          <p>Framed content decay prioritization against scarce human review capacity.</p>
-        </div>
-        <div class="journey-card">
-          <span class="step-num">Week 2 · ML-03</span>
-          <h4>ML Task Framing</h4>
-          <p>Formulated ranking objective, asymmetric error costs, and Precision@50 evaluation.</p>
-        </div>
-        <div class="journey-card">
-          <span class="step-num">Week 3 · ML-04/05</span>
-          <h4>Data Contract & Leakage</h4>
-          <p>Audited 79M+ warehouse contract; established strict pre-May temporal boundaries.</p>
-        </div>
-        <div class="journey-card">
-          <span class="step-num">Week 4 · ML-06/07</span>
-          <h4>Signal Audit & Baseline</h4>
-          <p>Engineered 3-signal non-learned heuristic rule (Precision@50 = 0.2000).</p>
-        </div>
-        <div class="journey-card">
-          <span class="step-num">Week 5 · ML-08</span>
-          <h4>Supervised Modeling</h4>
-          <p>Trained 9-feature Logistic Regression on client-holdout split (P@50 = 0.2400).</p>
-        </div>
-        <div class="journey-card">
-          <span class="step-num">Week 6 · ML-09</span>
-          <h4>Validation Audit</h4>
-          <p>Exposed partition instability (5 splits); ran controlled leakage demonstration.</p>
-        </div>
-        <div class="journey-card">
-          <span class="step-num">Week 7 · ML-10</span>
-          <h4>Action Playbook</h4>
-          <p>Built 5 archetypes, priority tiers, effort estimates, and anti-automation guardrails.</p>
-        </div>
-        <div class="journey-card">
-          <span class="step-num">Week 8 · ML-11</span>
-          <h4>Capstone Paper</h4>
-          <p>Synthesized reproducible public paper and verifiable evidence receipts.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- 7. Interactive Research Query Console -->
-    <section class="content-block" id="qa">
-      <div class="section-head">
-        <span class="label">7. Interactive Research Query Console</span>
-        <span class="count">Verified Findings</span>
-      </div>
-
-      <div class="qa-card">
-        <p style="font-size: 14.5px; color: var(--muted); margin-top: 0; margin-bottom: 18px;">
-          Query verified numbers, methodologies, and findings from the executed capstone research artifacts:
-        </p>
-
-        <div class="qa-input-row">
-          <input id="qa-input" type="text" placeholder="e.g., What is the primary model lift?" autocomplete="off" />
-          <button id="qa-submit">Search Findings</button>
-        </div>
-
-        <div class="qa-examples">
-          <button class="qa-chip" type="button">What is the primary model lift?</button>
-          <button class="qa-chip" type="button">What did repeated validation show?</button>
-          <button class="qa-chip" type="button">How was data leakage tested?</button>
-          <button class="qa-chip" type="button">What are the 5 review archetypes?</button>
-          <button class="qa-chip" type="button">What are the safety guardrails?</button>
-        </div>
-
-        <div id="qa-response" class="placeholder-text">
-          Select a prompt above or enter a search query regarding the dataset, baseline, model results, or playbook.
-        </div>
-      </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-      <div class="wrap">
-        <p>
-          FlyRank ML Engineering Internship Capstone · Shubham Sharma (2026) · Dataset provided by <a
-            href="https://flyrank.ai/" target="_blank" rel="noopener"
-            style="text-decoration: underline;">FlyRank.ai</a>
-        </p>
-        <p>
-          <a href="https://github.com/ShubhamSnSharma/flyrank-ml-internship" target="_blank" rel="noopener"
-            style="color: var(--rust);">GitHub Repository →</a>
-        </p>
-      </div>
-    </footer>
-
-  </div>
-
-  <!-- Client-Side Knowledge Base for Query Console -->
-  <script>
-    (function () {
-      const input = document.getElementById("qa-input");
-      const button = document.getElementById("qa-submit");
-      const responseBox = document.getElementById("qa-response");
-      const chips = document.querySelectorAll(".qa-chip");
-
-      const KNOWLEDGE_BASE = [
-        {
-          triggers: ["lift", "primary result", "precision@50", "p@50", "performance", "result"],
-          answer: "On the primary client-held-out test split (Seed 42, N=1,727 pages), the standardized Logistic Regression model achieved Precision@50 = 0.2400 (12/50 true declining pages) compared to 0.2000 (10/50) for the Week 4 Heuristic Baseline, representing a measured single-split lift of +0.0400 (+4.0 percentage points)."
-        },
-        {
-          triggers: ["repeated", "validation", "stability", "5 splits", "splits", "sensitivity"],
-          answer: "Across 5 repeated client-grouped holdouts (Seeds 42–46), Baseline Precision@50 averaged 0.3240 ± 0.2165 (0.1400 to 0.5600), while Logistic Regression averaged 0.3400 ± 0.1114 (0.2400 to 0.4800). Mean split-level lift was +0.0160 ± 0.1126 (+1.6 pp), ranging from -12.0 pp to +14.0 pp. The model outperformed the baseline in 3 splits and underperformed in 2, demonstrating substantial client-partition sensitivity."
-        },
-        {
-          triggers: ["leakage", "leak", "clean vs leaky", "injection", "future"],
-          answer: "Leakage was evaluated in ML-09 by running a controlled future-data injection test with May 2026 clicks. The clean W05 model scored Precision@50 = 0.2400 (ROC-AUC 0.4594), whereas the leaky model scored Precision@50 = 1.0000 (ROC-AUC 0.8921). This artificial performance jump demonstrates why strict pre-May temporal boundaries are vital to prevent evaluation distortion."
-        },
-        {
-          triggers: ["archetype", "archetypes", "playbook", "ml-10", "triage", "categories"],
-          answer: "The Content Action Playbook categorizes pages into 5 review archetypes: (1) High Search Impression / Thin Traffic (7,181 pages, ~3.5h effort), (2) Lower-Priority / Routine Monitoring (4,084 pages, ~0.5h effort), (3) Striking Distance / Search Visibility (3,603 pages, ~2.0h effort), (4) High Historical Traffic / Higher Decay Risk (1,216 pages, ~5.0h effort), and (5) General Higher-Decline-Risk Review (429 pages, ~3.0h effort)."
-        },
-        {
-          triggers: ["safety", "guardrail", "no-go", "autonomous", "cms", "redirect"],
-          answer: "The system enforces the guardrail 'MODEL_SCORE_DOES_NOT_AUTHORIZE_REDIRECT_OR_CANONICAL_CHANGE'. Strict no-go rules prohibit autonomous CMS modification, automatic page deletion, programmatic 301 redirects, and unsupervised YMYL edits. Pages with P(decay) >= 0.70 (272 pages in portfolio) require mandatory senior editor signoff."
-        },
-        {
-          triggers: ["dataset", "data", "size", "rows", "clients", "pages"],
-          answer: "The dataset covers 79M+ rows of FlyRank enterprise search-performance data. Applying activity-based eligibility criteria (>=1,000 Feb–Apr impressions and >=10 April clicks) produced an analysis cohort of 16,513 eligible pages across 36 client domains, with an overall portfolio base rate of 41.62% organic click decay."
-        },
-        {
-          triggers: ["baseline", "rule", "week 4", "w04", "heuristic"],
-          answer: "The Week 4 Heuristic Baseline is a transparent, non-learned rule that sums three binary indicators on April daily performance (GSC impressions >= 10, average position > 10, GA4 pageviews >= 1) and averages them per page. Evaluated on the same held-out test pages with identical tie-breaking, it achieved Precision@50 = 0.2000 on Seed 42."
-        },
-        {
-          triggers: ["features", "feature", "9 features", "coefficients", "model type"],
-          answer: "The model is a linear Logistic Regression classifier with balanced class weighting trained on 9 pre-May features: log GSC impressions, log GSC clicks, average position, log GA4 pageviews, log GA4 engaged sessions, client GSC flag, client GA4 flag, GSC data availability, and GA4 data availability. Top negative coefficient: log GA4 pageviews (-0.9394); top positive: GA4 data available (+0.7060) and average position (+0.3212)."
-        }
-      ];
-
-      function findAnswer(query) {
-        const q = query.toLowerCase();
-        for (const item of KNOWLEDGE_BASE) {
-          if (item.triggers.some(t => q.includes(t))) {
-            return item.answer;
-          }
-        }
-        return "This query is outside the verified notebook findings. Verified topics include: primary model lift (0.2400 vs 0.2000), 5-split repeated validation stability, controlled leakage audit (1.0000 vs 0.2400), the 5 playbook review archetypes, dataset eligibility (16,513 pages / 36 clients), and human-in-the-loop safety guardrails.";
-      }
-
-      function askQuestion(question) {
-        const q = (question || input.value).trim();
-        if (!q) return;
-
-        input.value = q;
-        button.disabled = true;
-        button.textContent = "Retrieving…";
-        responseBox.textContent = "";
-        responseBox.classList.remove("placeholder-text");
-
-        setTimeout(() => {
-          responseBox.textContent = findAnswer(q);
-          button.disabled = false;
-          button.textContent = "Search Findings";
-        }, 120);
-      }
-
-      button.addEventListener("click", () => askQuestion());
-      input.addEventListener("keydown", (e) => { if (e.key === "Enter") askQuestion(); });
-      chips.forEach((chip) => chip.addEventListener("click", () => askQuestion(chip.textContent)));
-    })();
-  </script>
+    </div>
+  </footer>
 
 </body>
 
