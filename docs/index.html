@@ -164,19 +164,126 @@
 
     .nav-links {
       display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
+      align-items: center;
+      gap: 22px;
     }
 
     .nav-links a {
-      font-size: 13px;
+      font-size: 12.5px;
+      letter-spacing: 0.02em;
       color: var(--muted);
       font-weight: 500;
+      white-space: nowrap;
       transition: color 0.15s ease;
     }
 
     .nav-links a:hover {
       color: var(--rust);
+    }
+
+    .nav-more {
+      position: relative;
+    }
+
+    .nav-more-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 12.5px;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+      font-weight: 500;
+      padding: 0;
+    }
+
+    .nav-more-btn:hover,
+    .nav-more-btn.open {
+      color: var(--rust);
+    }
+
+    .nav-more-btn svg {
+      width: 10px;
+      height: 10px;
+      transition: transform 0.15s ease;
+    }
+
+    .nav-more-btn.open svg {
+      transform: rotate(180deg);
+    }
+
+    .nav-more-panel {
+      display: none;
+      position: absolute;
+      top: calc(100% + 14px);
+      right: 0;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(43, 45, 66, 0.1);
+      padding: 8px;
+      min-width: 190px;
+    }
+
+    .nav-more-panel.open {
+      display: block;
+    }
+
+    .nav-more-panel a {
+      display: block;
+      padding: 8px 10px;
+      font-size: 12.5px;
+      color: var(--charcoal);
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .nav-more-panel a:hover {
+      background: var(--surface);
+      color: var(--rust);
+    }
+
+    /* ---------- Scroll Reveal & Load Sequence ---------- */
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16, 0.84, 0.44, 1);
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    .load-seq {
+      opacity: 0;
+      transform: translateY(14px);
+      animation: loadIn 0.7s cubic-bezier(0.16, 0.84, 0.44, 1) forwards;
+    }
+
+    @keyframes loadIn {
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .reveal,
+      .load-seq {
+        opacity: 1 !important;
+        transform: none !important;
+        animation: none !important;
+        transition: none !important;
+      }
+
+      .comp-fill {
+        transition: none !important;
+      }
     }
 
     /* ---------- Section Framework ---------- */
@@ -219,7 +326,11 @@
     header.hero-section {
       padding: 88px 0 68px;
       border-bottom: 1px solid var(--line);
-      background: radial-gradient(circle at 92% 8%, rgba(193, 80, 46, 0.04), transparent 55%);
+      background:
+        radial-gradient(circle at 92% 8%, rgba(193, 80, 46, 0.05), transparent 55%),
+        radial-gradient(rgba(43, 45, 66, 0.09) 1px, transparent 1px);
+      background-size: auto, 22px 22px;
+      background-position: center, center;
     }
 
     .hero-eyebrow {
@@ -261,11 +372,24 @@
     }
 
     .hero-stat-card {
+      position: relative;
       background: var(--surface);
       border: 1px solid var(--line);
       border-top: 3px solid var(--charcoal);
       border-radius: 0 0 6px 6px;
-      padding: 20px 24px;
+      padding: 24px 24px 20px;
+      overflow: hidden;
+    }
+
+    .hero-stat-card::before {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background-image: repeating-linear-gradient(90deg, var(--charcoal) 0 1px, transparent 1px 10px);
+      opacity: 0.22;
     }
 
     .hero-stat-num {
@@ -532,10 +656,36 @@
     }
 
     .card-box {
+      position: relative;
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: 6px;
       padding: 20px 24px;
+    }
+
+    .card-box::before,
+    .card-box::after {
+      content: '';
+      position: absolute;
+      width: 9px;
+      height: 9px;
+      border: 1.5px solid var(--rust);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .card-box::before {
+      top: -1px;
+      left: -1px;
+      border-right: none;
+      border-bottom: none;
+    }
+
+    .card-box::after {
+      bottom: -1px;
+      right: -1px;
+      border-left: none;
+      border-top: none;
     }
 
     .card-box h4 {
@@ -576,29 +726,43 @@
     }
 
     .comp-track {
+      position: relative;
       height: 10px;
       background: var(--bg);
       border-radius: 5px;
       overflow: hidden;
     }
 
+    .comp-scale {
+      display: grid;
+      grid-template-columns: 190px 1fr 70px;
+      gap: 16px;
+      padding: 2px 0 6px;
+    }
+
+    .comp-scale-ticks {
+      position: relative;
+      height: 6px;
+      background-image: repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 25%);
+      opacity: 0.9;
+    }
+
     .comp-fill {
       height: 100%;
+      width: 0;
       border-radius: 5px;
+      transition: width 1.15s cubic-bezier(0.16, 0.84, 0.44, 1);
     }
 
     .comp-fill.base {
-      width: 20%;
       background: var(--muted);
     }
 
     .comp-fill.model {
-      width: 24%;
       background: var(--rust);
     }
 
     .comp-fill.leak {
-      width: 100%;
       background: #1A1A1A;
     }
 
@@ -611,6 +775,82 @@
 
     .comp-score.accent {
       color: var(--rust);
+    }
+
+    /* ---------- Interactive Leakage Demo ---------- */
+    .leak-cta-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--line);
+    }
+
+    .leak-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--charcoal);
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 18px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+
+    .leak-btn:hover {
+      background: var(--rust);
+    }
+
+    .leak-btn:active {
+      transform: scale(0.97);
+    }
+
+    .leak-btn:disabled {
+      background: var(--muted);
+      cursor: default;
+      opacity: 0.6;
+    }
+
+    .leak-hint {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .leak-flag {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--rust);
+    }
+
+    .leak-flag.is-shown {
+      display: inline-flex;
+    }
+
+    @keyframes pulseGlow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(193, 80, 46, 0);
+      }
+
+      35% {
+        box-shadow: 0 0 0 4px rgba(193, 80, 46, 0.18);
+      }
+    }
+
+    .card-box.pulse-glow {
+      animation: pulseGlow 1.4s ease-out 1;
+      border-color: var(--rust);
     }
 
     /* ---------- Zero-Line Diverging Lift Chart ---------- */
@@ -938,17 +1178,29 @@
       </div>
       <div class="nav-links">
         <a href="#abstract">Abstract</a>
-        <a href="#question">Question</a>
-        <a href="#investigation">Investigation</a>
-        <a href="#exploratory-turn">Exploratory Turn</a>
-        <a href="#baseline">Final Model</a>
-        <a href="#validation">Validation</a>
-        <a href="#leakage">Leakage</a>
-        <a href="#use">Use Cases</a>
+        <a href="#question">Problem</a>
+        <a href="#data">Data</a>
+        <a href="#investigation">Method</a>
+        <a href="#validation">Results</a>
         <a href="#playbook">Playbook</a>
-        <a href="#learnings">Learnings</a>
         <a href="#safety">Safety</a>
-        <a href="#evidence">Evidence</a>
+        <a href="#evidence">Repro</a>
+        <div class="nav-more">
+          <button class="nav-more-btn" id="navMoreBtn" aria-expanded="false">
+            More
+            <svg viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
+          <div class="nav-more-panel" id="navMorePanel">
+            <a href="#exploratory-turn">Exploratory Turn</a>
+            <a href="#baseline">Final Model Detail</a>
+            <a href="#leakage">Leakage Test</a>
+            <a href="#use">Use Cases</a>
+            <a href="#learnings">Engineering Learnings</a>
+          </div>
+        </div>
       </div>
     </div>
   </nav>
@@ -956,9 +1208,11 @@
   <!-- 1. HERO SECTION -->
   <header class="hero-section">
     <div class="wrap">
-      <div class="hero-eyebrow">Machine Learning Engineering Capstone · FlyRank AI</div>
-      <h1 class="hero-title">Prioritizing Enterprise Content for Organic Search Traffic Decay Risk</h1>
-      <p class="hero-subtitle">
+      <div class="hero-eyebrow load-seq" style="animation-delay: 0.02s;">Machine Learning Engineering Capstone ·
+        FlyRank AI</div>
+      <h1 class="hero-title load-seq" style="animation-delay: 0.1s;">Prioritizing Enterprise Content for Organic
+        Search Traffic Decay Risk</h1>
+      <p class="hero-subtitle load-seq" style="animation-delay: 0.18s;">
         A machine learning engineering investigation into whether historical search-performance signals can help editors
         decide
         which published pages to review first.
@@ -966,28 +1220,30 @@
 
       <!-- 3 Scale Metrics Grid -->
       <div class="hero-stats-grid">
-        <div class="hero-stat-card">
-          <div class="hero-stat-num">16,513</div>
+        <div class="hero-stat-card load-seq" style="animation-delay: 0.26s;">
+          <div class="hero-stat-num" data-countup="16513" data-format="comma">0</div>
           <div class="hero-stat-label">Eligible Content Pages Analyzed</div>
         </div>
-        <div class="hero-stat-card">
-          <div class="hero-stat-num">36</div>
+        <div class="hero-stat-card load-seq" style="animation-delay: 0.32s;">
+          <div class="hero-stat-num" data-countup="36">0</div>
           <div class="hero-stat-label">Client Domains in Cohort</div>
         </div>
-        <div class="hero-stat-card">
-          <div class="hero-stat-num">79M+</div>
+        <div class="hero-stat-card load-seq" style="animation-delay: 0.38s;">
+          <div class="hero-stat-num" data-countup="79" data-suffix="M+">0M+</div>
           <div class="hero-stat-label">Warehouse Performance Rows</div>
         </div>
       </div>
 
       <!-- Core Result & Stability Signal Block -->
-      <div class="hero-result-banner">
+      <div class="hero-result-banner load-seq" style="animation-delay: 0.46s;">
         <div class="hero-result-col">
           <div class="hero-result-header">
             <h4>Primary Model Lift (Seed 42)</h4>
             <span class="badge badge-locked">Final Locked Capstone</span>
           </div>
-          <div class="hero-result-val">20.0% &rarr; 24.0% <span style="color: var(--rust); font-size: 0.85em;">(+4.0
+          <div class="hero-result-val"><span data-countup="20" data-decimals="1" data-suffix="%">0.0%</span>
+            &rarr; <span data-countup="24" data-decimals="1" data-suffix="%">0.0%</span> <span
+              style="color: var(--rust); font-size: 0.85em;">(+4.0
               pp)</span></div>
           <div class="hero-result-sub">Baseline vs. Logistic Regression Precision@50 (10/50 &rarr; 12/50 true positives)
           </div>
@@ -1003,13 +1259,13 @@
       </div>
 
       <!-- Honest Transition Statement -->
-      <div class="hero-statement">
+      <div class="hero-statement load-seq" style="animation-delay: 0.54s;">
         "The number I cared about wasn't the single-split score — it was how much that score moved when I held out
         entire client portfolios."
       </div>
 
       <!-- 3 Action Buttons -->
-      <div class="hero-actions">
+      <div class="hero-actions load-seq" style="animation-delay: 0.62s;">
         <a class="btn-primary"
           href="https://github.com/ShubhamSnSharma/flyrank-ml-internship/blob/main/work/capstone_report.md"
           target="_blank" rel="noopener">Read Full Capstone Report →</a>
@@ -1044,6 +1300,9 @@
   <section class="section-block" id="question">
     <div class="wrap">
       <span class="section-eyebrow">1. The Problem</span>
+      <div style="display: inline-block; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 4px 10px; font-size: 11.5px; font-weight: 600; color: var(--rust); margin-bottom: 10px;">
+        Lane: Refresh / Content Opportunity Scoring
+      </div>
       <h2 class="section-title">Can historical search signals help decide which pages editors should review first?</h2>
       <p class="section-p">
         Enterprise digital publishing teams manage thousands of published URLs, but editorial review bandwidth is
@@ -1071,10 +1330,60 @@
     </div>
   </section>
 
+  <!-- 2. DATA SOURCE & COHORT -->
+  <section class="section-block" id="data">
+    <div class="wrap">
+      <span class="section-eyebrow">2. Data Source, Cohort Filtering & Safety</span>
+      <h2 class="section-title">Which release, which window, and what got filtered out.</h2>
+
+      <p class="section-p">
+        The analysis queries FlyRank's hosted warehouse release (<code class="mono">hf://datasets/FlyRank/internship-warehouse</code>,
+        build v20260703) via DuckDB, drawing from the <code class="mono">fact_content_daily_performance</code> table —
+        79M+ rows of production search-performance data spanning January 27, 2025 to June 30, 2026 across 70 clients.
+        After eligibility filtering (below), the analysis cohort contained 16,513 eligible pages across 36 clients.
+      </p>
+
+      <div class="grid-2col" style="margin-top: 16px;">
+        <div class="card-box">
+          <h4>Temporal Windows</h4>
+          <p style="font-size: 13.5px; color: var(--muted); line-height: 1.7;">
+            <strong style="color: var(--charcoal);">Feature window:</strong> Feb 1 &ndash; Apr 30, 2026 (pre-May
+            historical aggregation)<br>
+            <strong style="color: var(--charcoal);">Target window:</strong> May 1 &ndash; 31, 2026 (strictly isolated
+            forward outcome period)<br>
+            <strong style="color: var(--charcoal);">Overlap:</strong> zero &mdash; all 9 production features are
+            constructed strictly from pre-May data.
+          </p>
+        </div>
+        <div class="card-box">
+          <h4>Cohort Inclusion Criteria</h4>
+          <p style="font-size: 13.5px; color: var(--muted); line-height: 1.7;">
+            To filter out newly launched or unindexed pages with volatile search noise, two volume thresholds were
+            applied:<br>
+            <strong style="color: var(--charcoal);">1.</strong> GSC Impressions (Feb&ndash;Apr) &ge; 1,000<br>
+            <strong style="color: var(--charcoal);">2.</strong> GSC Clicks (Apr) &ge; 10
+          </p>
+        </div>
+      </div>
+
+      <p class="section-p" style="margin-top: 16px;">
+        This eligibility filter is why 79M+ raw rows become 16,513 analysis-ready pages — the vast majority of
+        excluded rows are page-day observations from pages with too little search volume to produce a stable signal,
+        not a sampling shortcut.
+      </p>
+
+      <p class="section-p" style="font-size: 13px; color: var(--muted);">
+        <strong>Public safety:</strong> client and content identifiers are pseudonymized hashes used only for
+        grouping, joins, and deterministic ranking. Zero raw URLs, private search queries, or client domain names
+        appear anywhere in this analysis.
+      </p>
+    </div>
+  </section>
+
   <!-- 3. THE INVESTIGATION TIMELINE -->
   <section class="section-block" id="investigation">
     <div class="wrap">
-      <span class="section-eyebrow">2. What I Investigated</span>
+      <span class="section-eyebrow">3. What I Investigated</span>
       <h2 class="section-title">I didn't start with the model.</h2>
       <p class="section-p">
         Machine learning adds maintenance complexity and failure modes. I followed a structured 7-stage engineering
@@ -1125,7 +1434,7 @@
   <!-- 4. DEDICATED "EXPLORATORY INVESTIGATIONS" SECTION -->
   <section class="section-block" id="exploratory-turn">
     <div class="wrap">
-      <span class="section-eyebrow">3. The Exploratory Turn</span>
+      <span class="section-eyebrow">4. The Exploratory Turn</span>
       <h2 class="section-title">The investigations that changed the direction</h2>
       <p class="section-p">
         I didn't stop at the first result that looked good. I tested alternative feature representations, checked
@@ -1297,7 +1606,7 @@
   <!-- 5. FINAL LOCKED BASELINE & MODEL -->
   <section class="section-block" id="baseline">
     <div class="wrap">
-      <span class="section-eyebrow">4. Final Locked Capstone Model</span>
+      <span class="section-eyebrow">5. Final Locked Capstone Model</span>
       <h2 class="section-title">Before ML, I built a rule I could explain.</h2>
       <p class="section-p">
         To establish an interpretable benchmark, I built a non-learned heuristic baseline from three April signals:
@@ -1311,14 +1620,14 @@
         <div class="comp-row">
           <span class="comp-name">Heuristic Baseline</span>
           <div class="comp-track">
-            <div class="comp-fill base"></div>
+            <div class="comp-fill base" data-target-width="20"></div>
           </div>
           <span class="comp-score">20.0%</span>
         </div>
         <div class="comp-row">
           <span class="comp-name">Final Logistic Regression</span>
           <div class="comp-track">
-            <div class="comp-fill model"></div>
+            <div class="comp-fill model" data-target-width="24"></div>
           </div>
           <span class="comp-score accent">24.0%</span>
         </div>
@@ -1360,7 +1669,7 @@
   <!-- 6. CLIENT-GROUPED VALIDATION -->
   <section class="section-block" id="validation">
     <div class="wrap">
-      <span class="section-eyebrow">5. Validation Design & Stability Audit</span>
+      <span class="section-eyebrow">6. Validation Design & Stability Audit</span>
       <h2 class="section-title">Does the result survive when whole clients are held out?</h2>
       <p class="section-p">
         Client-grouped validation was used because pages from the same client can share domain-specific taxonomy and
@@ -1476,7 +1785,7 @@
   <!-- 7. LEAKAGE TEST -->
   <section class="section-block" id="leakage">
     <div class="wrap">
-      <span class="section-eyebrow">6. Evaluation Integrity</span>
+      <span class="section-eyebrow">7. Evaluation Integrity</span>
       <h2 class="section-title">I also tried to break the evaluation.</h2>
       <p class="section-p">
         To test whether the validation framework detects subtle leakage, I ran an intentional stress test injecting
@@ -1484,20 +1793,26 @@
       </p>
 
       <!-- Clean vs Leaky Comparison -->
-      <div class="comp-bar-container">
+      <div class="comp-bar-container" id="leakDemo">
         <div class="comp-row">
           <span class="comp-name">Clean Model</span>
           <div class="comp-track">
-            <div class="comp-fill model"></div>
+            <div class="comp-fill model" data-target-width="24"></div>
           </div>
           <span class="comp-score">0.2400</span>
         </div>
         <div class="comp-row">
           <span class="comp-name">May Data Injected</span>
           <div class="comp-track">
-            <div class="comp-fill leak"></div>
+            <div class="comp-fill leak" id="leakFill" style="width: 0;"></div>
           </div>
-          <span class="comp-score" style="color: #4A5568;">1.0000</span>
+          <span class="comp-score" id="leakScore" style="color: #4A5568;">0.0000</span>
+        </div>
+        <div class="leak-cta-row">
+          <button class="leak-btn" id="leakBtn" type="button">▶ Run the leakage test</button>
+          <span class="leak-hint">Re-scores the same model after injecting May 2026 clicks into the feature set.</span>
+          <span class="leak-flag" id="leakFlag">🚩 Leakage confirmed — score jumped because of future data, not a
+            better model.</span>
         </div>
       </div>
 
@@ -1521,7 +1836,7 @@
             <strong style="color: var(--charcoal);">0.2400 P@50</strong>
           </p>
         </div>
-        <div class="card-box" style="border-left: 3px solid var(--rust);">
+        <div class="card-box" id="invalidCard" style="border-left: 3px solid var(--rust);">
           <h4 style="color: var(--rust);">Invalid Evaluation</h4>
           <p style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.9; margin: 0;">
             Pre-May features + May clicks<br>
@@ -1540,7 +1855,7 @@
   <!-- 8. WHAT THE FINAL MODEL ACTUALLY DOES -->
   <section class="section-block" id="use">
     <div class="wrap">
-      <span class="section-eyebrow">7. Operational Role</span>
+      <span class="section-eyebrow">8. Operational Role</span>
       <h2 class="section-title">So what is the model actually useful for?</h2>
       <p class="section-p">
         The model ranks pages by estimated probability of the observed decay label, using historical pre-May signals.
@@ -1582,7 +1897,7 @@
   <!-- 9. ACTION PLAYBOOK -->
   <section class="section-block" id="playbook">
     <div class="wrap">
-      <span class="section-eyebrow">8. Decision-Support Playbook</span>
+      <span class="section-eyebrow">9. Decision-Support Playbook</span>
       <h2 class="section-title">From model scores to editorial planning.</h2>
       <p class="section-p">
         The ML-10 Action Playbook maps predicted probabilities into 5 review archetypes and priority tiers across the
@@ -1634,14 +1949,14 @@
           <div class="fig-grid">
             <div class="fig-item">
               <img src="figures/action_archetype_distribution.png" alt="Archetype Distribution across Priority Tiers" />
-              <div class="fig-caption">Figure 1: Distribution of Action Archetypes across Portfolio Priority Tiers.</div>
+              <div class="fig-caption">Figure 1: Distribution of Action Archetypes across Portfolio Priority Tiers.
+              </div>
             </div>
             <div class="fig-item">
               <img src="figures/effort_vs_risk_matrix.png" alt="Effort vs Risk Matrix" />
               <div class="fig-caption">Figure 2: Review Effort vs Model Decay Risk Matrix (272-page senior queue).</div>
             </div>
           </div>
-          
           <p style="font-size: 11.5px; color: var(--muted); margin-top: 10px;">
             *Scoring across the 16,513-page portfolio uses in-sample predicted probabilities for triage illustration —
             these are not calibrated out-of-sample estimates. Effort hours (166.5h Top-50 / 41,748.5h Total) are
@@ -1655,7 +1970,7 @@
   <!-- 10. WHAT I LEARNED -->
   <section class="section-block" id="learnings">
     <div class="wrap">
-      <span class="section-eyebrow">9. Engineering Takeaways</span>
+      <span class="section-eyebrow">10. Engineering Takeaways</span>
       <h2 class="section-title">What the investigation changed my mind about</h2>
       <p class="section-p">
         Rigorous machine learning engineering is defined by testing assumptions against empirical reality:
@@ -1690,7 +2005,7 @@
   <!-- 11. SAFETY + LIMITATIONS -->
   <section class="section-block" id="safety">
     <div class="wrap">
-      <span class="section-eyebrow">10. Safety & Limits</span>
+      <span class="section-eyebrow">11. Safety & Limits</span>
       <h2 class="section-title">A model score does not authorize a CMS change.</h2>
 
       <div class="safety-block">
@@ -1727,7 +2042,7 @@
   <!-- 12. EVIDENCE / REPRODUCIBILITY -->
   <section class="section-block" id="evidence">
     <div class="wrap">
-      <span class="section-eyebrow">11. Reproducibility & Research Artifacts</span>
+      <span class="section-eyebrow">12. Reproducibility & Research Artifacts</span>
       <h2 class="section-title">Follow the evidence.</h2>
       <p class="section-p">
         The core metrics and analysis results can be traced to the repository notebooks and supporting artifacts:
@@ -1837,6 +2152,175 @@
       </div>
     </div>
   </footer>
+
+  <script>
+    (function () {
+      var btn = document.getElementById('navMoreBtn');
+      var panel = document.getElementById('navMorePanel');
+      if (!btn || !panel) return;
+
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var isOpen = panel.classList.toggle('open');
+        btn.classList.toggle('open', isOpen);
+        btn.setAttribute('aria-expanded', isOpen);
+      });
+
+      panel.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', function () {
+          panel.classList.remove('open');
+          btn.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      document.addEventListener('click', function (e) {
+        if (!panel.contains(e.target) && e.target !== btn) {
+          panel.classList.remove('open');
+          btn.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    })();
+
+    /* ---------- Count-up numbers ---------- */
+    (function () {
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function formatNumber(value, decimals, format, suffix) {
+        var str = value.toFixed(decimals);
+        if (format === 'comma') {
+          var parts = str.split('.');
+          parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          str = parts.join('.');
+        }
+        return str + (suffix || '');
+      }
+
+      function runCountUp(el) {
+        var target = parseFloat(el.getAttribute('data-countup'));
+        var decimals = parseInt(el.getAttribute('data-decimals') || '0', 10);
+        var suffix = el.getAttribute('data-suffix') || '';
+        var format = el.getAttribute('data-format') || '';
+
+        if (reduceMotion || isNaN(target)) {
+          el.textContent = formatNumber(target, decimals, format, suffix);
+          return;
+        }
+
+        var duration = 1200;
+        var start = null;
+
+        function step(ts) {
+          if (!start) start = ts;
+          var progress = Math.min((ts - start) / duration, 1);
+          var eased = 1 - Math.pow(1 - progress, 3);
+          el.textContent = formatNumber(target * eased, decimals, format, suffix);
+          if (progress < 1) {
+            requestAnimationFrame(step);
+          } else {
+            el.textContent = formatNumber(target, decimals, format, suffix);
+          }
+        }
+        requestAnimationFrame(step);
+      }
+
+      var countEls = document.querySelectorAll('[data-countup]');
+      window.addEventListener('load', function () {
+        setTimeout(function () {
+          countEls.forEach(runCountUp);
+        }, reduceMotion ? 0 : 350);
+      });
+    })();
+
+    /* ---------- Scroll reveal for sections + growing bars ---------- */
+    (function () {
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (reduceMotion || !('IntersectionObserver' in window)) {
+        document.querySelectorAll('.comp-fill[data-target-width]').forEach(function (fill) {
+          fill.style.width = fill.getAttribute('data-target-width') + '%';
+        });
+        return;
+      }
+
+      var sectionObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            sectionObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
+
+      document.querySelectorAll('section.section-block').forEach(function (el) {
+        el.classList.add('reveal');
+        sectionObserver.observe(el);
+      });
+
+      var barObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            var fills = entry.target.querySelectorAll('.comp-fill[data-target-width]');
+            fills.forEach(function (fill) {
+              fill.style.width = fill.getAttribute('data-target-width') + '%';
+            });
+            barObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.3 });
+
+      document.querySelectorAll('.comp-bar-container').forEach(function (el) {
+        barObserver.observe(el);
+      });
+    })();
+
+    /* ---------- Interactive leakage demo ---------- */
+    (function () {
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var btn = document.getElementById('leakBtn');
+      var fill = document.getElementById('leakFill');
+      var scoreEl = document.getElementById('leakScore');
+      var flag = document.getElementById('leakFlag');
+      var invalidCard = document.getElementById('invalidCard');
+      if (!btn || !fill || !scoreEl) return;
+
+      btn.addEventListener('click', function () {
+        btn.disabled = true;
+        btn.textContent = '✓ Test complete';
+
+        if (reduceMotion) {
+          fill.style.width = '100%';
+          scoreEl.textContent = '1.0000';
+          scoreEl.style.color = '#1A1A1A';
+          if (flag) flag.classList.add('is-shown');
+          if (invalidCard) invalidCard.classList.add('pulse-glow');
+          return;
+        }
+
+        fill.style.width = '100%';
+
+        var duration = 1100;
+        var start = null;
+
+        function step(ts) {
+          if (!start) start = ts;
+          var progress = Math.min((ts - start) / duration, 1);
+          var eased = 1 - Math.pow(1 - progress, 3);
+          scoreEl.textContent = (eased * 1).toFixed(4);
+          if (progress < 1) {
+            requestAnimationFrame(step);
+          } else {
+            scoreEl.textContent = '1.0000';
+            scoreEl.style.color = '#1A1A1A';
+            if (flag) flag.classList.add('is-shown');
+            if (invalidCard) invalidCard.classList.add('pulse-glow');
+          }
+        }
+        requestAnimationFrame(step);
+      });
+    })();
+  </script>
 
 </body>
 
