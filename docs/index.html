@@ -1283,8 +1283,9 @@
     <div class="wrap">
       <span class="section-eyebrow">Abstract</span>
       <p class="section-p" style="font-size: 15.5px;">
-        This investigation evaluates whether historical search-performance signals can help prioritize published
-        pages for human review of organic traffic decay. Using 16,513 eligible pages across 36 client domains, I
+        This investigation evaluates whether historical search-performance signals can improve on FlyRank's existing
+        hand-written flag system for prioritizing published pages for human review of organic traffic decay. Using
+        16,513 eligible pages across 36 client domains, I
         compared a transparent heuristic baseline with a standardized 9-feature Logistic Regression under
         client-grouped validation. On the primary Seed 42 split, Precision@50 increased from 20.0% to 24.0%,
         identifying 12 true declining pages among the top 50 compared with 10 from the baseline. Across five client
@@ -1311,6 +1312,15 @@
       <p class="section-p">
         The goal is not to automatically alter search settings or generate unreviewed copy. The goal is to rank pages so
         human editorial teams can decide where to direct diagnostic attention first.
+      </p>
+
+      <p class="section-p">
+        This gap already exists inside FlyRank's own product. FlyRank's platform ships hand-written flags today — a
+        health score, quick-win tags, needs-attention markers — each built from thresholds someone chose by hand.
+        They work, and they run in production. But fixed rules run out once signals multiply and start moving
+        together across a large client portfolio, and no trained model has replaced them yet. This capstone tests
+        whether a learned model can close that specific gap for one decision: which pages to route into editorial
+        review first.
       </p>
 
       <!-- Simple Visual Flow -->
