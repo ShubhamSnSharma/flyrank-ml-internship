@@ -467,6 +467,110 @@
       line-height: 1.45;
     }
 
+    /* Hero Exploratory Teaser */
+    .hero-explore-teaser {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      background: #FFF8F1;
+      border: 1px solid #F0D9B8;
+      border-left: 3px solid var(--rust);
+      border-radius: 6px;
+      padding: 12px 18px;
+      margin-bottom: 22px;
+      font-size: 13.5px;
+      color: var(--charcoal);
+    }
+
+    .hero-explore-teaser .badge-exploratory {
+      flex-shrink: 0;
+    }
+
+    .hero-explore-teaser .explore-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--rust);
+    }
+
+    .hero-explore-teaser a {
+      color: var(--rust);
+      font-weight: 600;
+      text-decoration: underline;
+      white-space: nowrap;
+    }
+
+    /* Exploratory Big-Number Showcase */
+    .explore-highlight-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 22px 0 26px;
+    }
+
+    .explore-highlight-card {
+      position: relative;
+      background: #FFF8F1;
+      border: 1px solid #F0D9B8;
+      border-top: 3px solid var(--rust);
+      border-radius: 0 0 6px 6px;
+      padding: 20px 22px;
+      overflow: hidden;
+    }
+
+    .explore-highlight-card::before {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background-image: repeating-linear-gradient(90deg, var(--rust) 0 1px, transparent 1px 10px);
+      opacity: 0.22;
+    }
+
+    .explore-highlight-badgerow {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .explore-highlight-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 42px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--rust);
+      margin-bottom: 4px;
+    }
+
+    .explore-highlight-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 8px;
+    }
+
+    .explore-highlight-mean {
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px dashed var(--line);
+      padding-top: 8px;
+      margin-top: 4px;
+    }
+
+    .explore-highlight-mean strong {
+      color: var(--charcoal);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    @media (max-width: 640px) {
+      .explore-highlight-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
     /* Action Buttons */
     .hero-actions {
       display: flex;
@@ -1258,6 +1362,16 @@
         </div>
       </div>
 
+      <!-- Exploratory Investigation Teaser -->
+      <div class="hero-explore-teaser load-seq" style="animation-delay: 0.5s;">
+        <span class="badge badge-exploratory">Exploratory Investigation</span>
+        <span>Trajectory-feature experiments peaked at <span class="explore-num">74.0%</span> P@50 (5-seed mean
+          <span class="explore-num">54.8% &plusmn; 10.6%</span>) and <span class="explore-num">60.0%</span> with
+          Random Forest (5-seed mean <span class="explore-num">57.6% &plusmn; 9.3%</span>) — not promoted to the
+          locked result, but worth reading.</span>
+        <a href="#exploratory-turn">See the investigation &rarr;</a>
+      </div>
+
       <!-- Honest Transition Statement -->
       <div class="hero-statement load-seq" style="animation-delay: 0.54s;">
         "The number I cared about wasn't the single-split score — it was how much that score moved when I held out
@@ -1450,6 +1564,28 @@
         I didn't stop at the first result that looked good. I tested alternative feature representations, checked
         whether high single-split scores held up across seeds, and stress-tested the evaluation framework:
       </p>
+
+      <!-- Exploratory Big-Number Showcase -->
+      <div class="explore-highlight-row">
+        <div class="explore-highlight-card">
+          <div class="explore-highlight-badgerow">
+            <span class="badge badge-exploratory">Exploratory Peak</span>
+          </div>
+          <div class="explore-highlight-num" data-countup="74" data-decimals="1" data-suffix="%">0.0%</div>
+          <div class="explore-highlight-label">Trajectory Logistic Regression &middot; Seed 42 &middot; 37/50</div>
+          <div class="explore-highlight-mean">5-seed mean: <strong>54.8% &plusmn; 10.6%</strong> (44.0%&ndash;74.0%)
+          </div>
+        </div>
+        <div class="explore-highlight-card">
+          <div class="explore-highlight-badgerow">
+            <span class="badge badge-exploratory">Exploratory Peak</span>
+          </div>
+          <div class="explore-highlight-num" data-countup="60" data-decimals="1" data-suffix="%">0.0%</div>
+          <div class="explore-highlight-label">Random Forest (200 trees) &middot; Seed 42 &middot; 30/50</div>
+          <div class="explore-highlight-mean">5-seed mean: <strong>57.6% &plusmn; 9.3%</strong> (42.0%&ndash;70.0%)
+          </div>
+        </div>
+      </div>
 
       <!-- 3 Investigation Cards Grid -->
       <div class="grid-3col">
@@ -1959,14 +2095,14 @@
           <div class="fig-grid">
             <div class="fig-item">
               <img src="figures/action_archetype_distribution.png" alt="Archetype Distribution across Priority Tiers" />
-              <div class="fig-caption">Figure 1: Distribution of Action Archetypes across Portfolio Priority Tiers.</div>
+              <div class="fig-caption">Figure 1: Distribution of Action Archetypes across Portfolio Priority Tiers.
+              </div>
             </div>
             <div class="fig-item">
               <img src="figures/effort_vs_risk_matrix.png" alt="Effort vs Risk Matrix" />
               <div class="fig-caption">Figure 2: Review Effort vs Model Decay Risk Matrix (272-page senior queue).</div>
             </div>
           </div>
-          
           <p style="font-size: 11.5px; color: var(--muted); margin-top: 10px;">
             *Scoring across the 16,513-page portfolio uses in-sample predicted probabilities for triage illustration —
             these are not calibrated out-of-sample estimates. Effort hours (166.5h Top-50 / 41,748.5h Total) are
